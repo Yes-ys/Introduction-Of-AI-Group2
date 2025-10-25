@@ -52,7 +52,6 @@ public abstract class EngineFeeder {
         Frontier frontier = new StackFrontier();
         //生成IdAStar引擎（算法实例）
         return new IdAStar(frontier);
-        //return new IdAStar(frontier, predictor);
     }
 
     /**
