@@ -23,7 +23,7 @@ public class NPuzzleProblem extends Problem {
 
     @Override
     public int stepCost(State state, Action action) {
-        return 0;
+        return 1;
     }
 
     @Override

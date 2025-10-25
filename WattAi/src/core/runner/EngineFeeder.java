@@ -41,6 +41,7 @@ public abstract class EngineFeeder {
      * @param type 不同问题的估值函数的类型
      * @return 启发函数
      */
+    // todo: wx
     public abstract Predictor getPredictor(HeuristicType type);
 
     /**
