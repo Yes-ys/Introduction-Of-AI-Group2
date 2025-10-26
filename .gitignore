@@ -1,0 +1,43 @@
+# IntelliJ IDEA
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/dictionaries/
+.idea/shelf/
+.idea/httpRequests/      # 可选，IDEA 使用的本地 http request 存储
+# But keep project-level settings we might want to share:
+# .idea/codeStyles/
+# .idea/runConfigurations/
+
+*.iml
+*.iws
+
+# Build / output
+/out/
+/target/
+/build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+
+# Gradle
+.gradle/
+build/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+
+# temp files
+*.swp
+*~ 
+
