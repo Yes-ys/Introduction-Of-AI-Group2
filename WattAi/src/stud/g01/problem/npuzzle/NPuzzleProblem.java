@@ -16,6 +16,7 @@ public class NPuzzleProblem extends Problem {
         super(initialState, goal, size);
     }
 
+    // todo: wx
     @Override
     public boolean solvable() {
         return false;
@@ -26,6 +27,7 @@ public class NPuzzleProblem extends Problem {
         return 1;
     }
 
+    // todo: ljh
     @Override
     public boolean applicable(State state, Action action) {
         return false;
