@@ -8,9 +8,6 @@ import core.solver.queue.EvaluationType;
 import core.solver.queue.Frontier;
 import stud.g01.problem.npuzzle.NPuzzleProblem;
 import stud.g01.problem.npuzzle.PuzzleBoard;
-import stud.problem.pathfinding.GridType;
-import stud.problem.pathfinding.PathFinding;
-import stud.problem.pathfinding.Position;
 
 import java.util.ArrayList;
 
