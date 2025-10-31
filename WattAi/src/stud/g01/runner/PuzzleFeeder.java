@@ -12,7 +12,7 @@ import stud.g01.problem.npuzzle.PuzzleBoard;
 import java.util.ArrayList;
 
 public class PuzzleFeeder extends EngineFeeder {
-    // ½«´ÓÎÄ¼şÖĞ¶ÁÈ¡µ½µÄ×Ö·û´® Array ×ª»¯Îª Problem Array
+    // å°†ä»æ–‡ä»¶ä¸­è¯»å–åˆ°çš„å­—ç¬¦ä¸² Array è½¬åŒ–ä¸º Problem Array
     @Override
     public ArrayList<Problem> getProblems(ArrayList<String> problemLines) {
         int lineNo = 0;
@@ -30,15 +30,15 @@ public class PuzzleFeeder extends EngineFeeder {
         return problems;
     }
 
-    // ¸ù¾İ±ØÒªµÄĞÅÏ¢³õÊ¼»¯Ò»¸ö NPuzzleProblem ¶ÔÏó
+    // æ ¹æ®å¿…è¦çš„ä¿¡æ¯åˆå§‹åŒ–ä¸€ä¸ª NPuzzleProblem å¯¹è±¡
     public NPuzzleProblem getNPuzzleProblem(int size, int[][] originBoard, int[][] targetBoard) {
         PuzzleBoard origin = new PuzzleBoard(originBoard);
         PuzzleBoard target = new PuzzleBoard(targetBoard);
         return new NPuzzleProblem(origin, target, size);
     }
 
-    // ´ÓÊäÈëÖĞ¶ÁÈ¡ĞèÒªµÄ board
-    // ĞèÒª¶ÁÈ¡µÄ board ´ÓÊäÈë problemLines µÄµÚ startLine ĞĞ¿ªÊ¼£¬Õ¼¾İ size ĞĞ
+    // ä»è¾“å…¥ä¸­è¯»å–éœ€è¦çš„ board
+    // éœ€è¦è¯»å–çš„ board ä»è¾“å…¥ problemLines çš„ç¬¬ startLine è¡Œå¼€å§‹ï¼Œå æ® size è¡Œ
     public int[][] getBoard(ArrayList<String> problemLines, int startLine, int size) {
         int[][] map = new int[size][];
         for (int i = 0; i < size; i++){

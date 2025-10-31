@@ -5,7 +5,7 @@ import stud.g01.problem.npuzzle.Direction;
 
 /**
  *
- * ¿ÕÏĞ¿éµÄÒÆ¶¯¶¯×÷£¬ÓĞNSEWËÄ¸öÑ¡Ôñ.
+// ç©ºé—²å—çš„ç§»åŠ¨åŠ¨ä½œï¼Œæœ‰NSEWå››ä¸ªé€‰æ‹©.
  */
 public class Move extends Action {
 
@@ -24,11 +24,11 @@ public class Move extends Action {
         System.out.println(this);
     }
 
-    // ·µ»Ø direction ¶¯×÷µÄcost
+    // è¿”å› direction åŠ¨ä½œçš„cost
     @Override
     public int stepCost() {return Direction.cost(direction);}
 
-    // ·µ»Øµ±Ç° direction µÄ¶¯×÷µÄÃû³Æ£ºN, E, S, W
+    // è¿”å›å½“å‰ direction çš„åŠ¨ä½œçš„åç§°ï¼šN, E, S, W
     @Override
     public String toString() {
         return direction.name();
@@ -36,12 +36,12 @@ public class Move extends Action {
 
     @Override
     public boolean equals(Object obj) {
-        // obj ºÍµ±Ç°¶ÔÏóÊÇÍ¬Ò»¸öÒıÓÃ
+        // obj å’Œå½“å‰å¯¹è±¡æ˜¯åŒä¸€ä¸ªå¼•ç”¨
         if (obj == this) return true;
 
-        // ³¢ÊÔ½« obj Ç¿ÖÆ×ª»¯Îª Move ¶ÔÏó£¬±È½ÏËüÃÇµÄÊôĞÔÊÇ·ñÏàÍ¬
+        // å°è¯•å°† obj å¼ºåˆ¶è½¬åŒ–ä¸º Move å¯¹è±¡ï¼Œæ¯”è¾ƒå®ƒä»¬çš„å±æ€§æ˜¯å¦ç›¸åŒ
         if (obj instanceof Move another) {
-            //Á½¸öNode¶ÔÏóµÄ×´Ì¬ÏàÍ¬£¬ÔòÈÏÎªÊÇÏàÍ¬µÄ
+            //ä¸¤ä¸ªNodeå¯¹è±¡çš„çŠ¶æ€ç›¸åŒï¼Œåˆ™è®¤ä¸ºæ˜¯ç›¸åŒçš„
             return this.direction.equals(another.direction);
         }
         return false;

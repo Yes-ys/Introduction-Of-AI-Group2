@@ -13,16 +13,16 @@ import java.util.EnumMap;
 import static core.solver.algorithm.heuristic.HeuristicType.*;
 
 /**
- * PathFindingÎÊÌâµÄ×´Ì¬
- * Î»ÖÃ×´Ì¬£¬±íÊ¾Ñ°Â·»úÆ÷ÈËÔÚÊ²Ã´Î»ÖÃ
+ * PathFindingé—®é¢˜çš„çŠ¶æ€
+ * ä½ç½®çŠ¶æ€ï¼Œè¡¨ç¤ºå¯»è·¯æœºå™¨äººåœ¨ä»€ä¹ˆä½ç½®
  */
 public class PuzzleBoard extends State {
-    // µ±Ç°µÄÆåÅÌ×´Ì¬£¬ÆåÅÌµÄ size ¿ÉÒÔÍ¨¹ı board.length »ñÈ¡
+    // å½“å‰çš„æ£‹ç›˜çŠ¶æ€ï¼Œæ£‹ç›˜çš„ size å¯ä»¥é€šè¿‡ board.length è·å–
     int [][] board;
-    // µ±Ç°¿ÕÎ»µÄ×ø±ê(ÏÂ±ê´Ó 0 ¿ªÊ¼£¬×óÉÏ½ÇÎª (0, 0))
+    // å½“å‰ç©ºä½çš„åæ ‡(ä¸‹æ ‡ä» 0 å¼€å§‹ï¼Œå·¦ä¸Šè§’ä¸º (0, 0))
     int x, y;
 
-    // ¹¹Ôìº¯Êı
+    // æ„é€ å‡½æ•°
     public PuzzleBoard(int[][] b, int x0, int y0){
         this.board = b;
         this.x = x0;
@@ -42,7 +42,7 @@ public class PuzzleBoard extends State {
         }
     }
 
-    // ¸´ÖÆ¹¹Ôìº¯Êı
+    // å¤åˆ¶æ„é€ å‡½æ•°
     public PuzzleBoard(PuzzleBoard another){
         this.x = another.x;
         this.y = another.y;
@@ -59,24 +59,24 @@ public class PuzzleBoard extends State {
     }
 
     /**
-     * µ±Ç°×´Ì¬²ÉÓÃaction¶ø½øÈëµÄÏÂÒ»¸ö×´Ì¬
+     * å½“å‰çŠ¶æ€é‡‡ç”¨actionè€Œè¿›å…¥çš„ä¸‹ä¸€ä¸ªçŠ¶æ€
      *
-     * @param action µ±Ç°×´Ì¬ÏÂ£¬Ò»¸ö¿ÉĞĞµÄaction
-     * @return ÏÂÒ»¸ö×´Ì¬
+     * @param action å½“å‰çŠ¶æ€ä¸‹ï¼Œä¸€ä¸ªå¯è¡Œçš„action
+     * @return ä¸‹ä¸€ä¸ªçŠ¶æ€
      */
     @Override
     public State next(Action action) {
-        //µ±Ç°ActionËù´øÀ´µÄÎ»ÒÆÁ¿
+        //å½“å‰Actionæ‰€å¸¦æ¥çš„ä½ç§»é‡
         Direction dir = ((Move)action).getDirection();
         int[] offsets = Direction.offset(dir);
 
-        // ²ÉÓÃ action Ö®ºó¿ÕÎ»×ªÒÆµ½µÄÎ»ÖÃ
+        // é‡‡ç”¨ action ä¹‹åç©ºä½è½¬ç§»åˆ°çš„ä½ç½®
         int col = y + offsets[0];
         int row = x + offsets[1];
-        // Ô­ÆåÅÌÉÏµÄ [row, col] Î»ÖÃÉÏµÄÊı
+        // åŸæ£‹ç›˜ä¸Šçš„ [row, col] ä½ç½®ä¸Šçš„æ•°
         int dest_val = board[row][col];
 
-        // ¹¹½¨ĞÂ¶ÔÏó
+        // æ„å»ºæ–°å¯¹è±¡
         PuzzleBoard result = new PuzzleBoard(this);
         result.board[row][col] = 0;
         result.board[x][y] = dest_val;
@@ -94,7 +94,7 @@ public class PuzzleBoard extends State {
     }
 // todo: wx
 
-//    //Ã¶¾ÙÓ³Éä£¬´æ·Å²»Í¬ÀàĞÍµÄÆô·¢º¯Êı
+//    //æšä¸¾æ˜ å°„ï¼Œå­˜æ”¾ä¸åŒç±»å‹çš„å¯å‘å‡½æ•°
 //    private static final EnumMap<HeuristicType, Predictor> predictors = new EnumMap<>(HeuristicType.class);
 //    static{
 //        predictors.put(PF_EUCLID,
@@ -109,7 +109,7 @@ public class PuzzleBoard extends State {
 //        return predictors.get(type);
 //    }
 //
-//    //Á½¸öµãÖ®¼äµÄGrid¾àÀë£¬¾¡Á¿×ß¶Ô½ÇÏß
+//    //ä¸¤ä¸ªç‚¹ä¹‹é—´çš„Gridè·ç¦»ï¼Œå°½é‡èµ°å¯¹è§’çº¿
 //    private int gridDistance(Position goal) {
 //        int width = Math.abs(this.col - goal.col);
 //        int height = Math.abs(this.row - goal.row);
@@ -117,12 +117,12 @@ public class PuzzleBoard extends State {
 //        return Math.abs(width - height) * SCALE + Math.min(width, height) * (int) (SCALE * ROOT2);
 //    }
 //
-//    //Á½¸öµãÖ®¼äµÄÂü¹ş¶Ù¾àÀë³ËÒÔSCALE
+//    //ä¸¤ä¸ªç‚¹ä¹‹é—´çš„æ›¼å“ˆé¡¿è·ç¦»ä¹˜ä»¥SCALE
 //    private int manhattan(Position goal) {
 //        return (Math.abs(this.row - goal.row) + Math.abs(this.col - goal.col)) * SCALE;
 //    }
 //
-//    //Á½¸öµãÖ®¼äµÄÅ·¼¸ÀïµÂ¾àÀë
+//    //ä¸¤ä¸ªç‚¹ä¹‹é—´çš„æ¬§å‡ é‡Œå¾·è·ç¦»
 //    private int euclid(Position goal) {
 //        int width = this.col - goal.col;
 //        int height = this.row - goal.row;
@@ -134,7 +134,7 @@ public class PuzzleBoard extends State {
         if (obj == this) return true;
 
         if (obj instanceof PuzzleBoard another) {
-            //Á½¸öBoard¶ÔÏóÈç¹ûËùÓĞÊôĞÔ¶¼ÊÇÏàÍ¬µÄ£¬ÔòÈÏÎªËüÃÇÏàµÈ
+            //ä¸¤ä¸ªBoardå¯¹è±¡å¦‚æœæ‰€æœ‰å±æ€§éƒ½æ˜¯ç›¸åŒçš„ï¼Œåˆ™è®¤ä¸ºå®ƒä»¬ç›¸ç­‰
             if (this.x == another.x && this.y == another.y){
                 int crt_size = board.length;
                 for (int i = 0; i < crt_size; i++){
@@ -148,13 +148,13 @@ public class PuzzleBoard extends State {
         return false;
     }
 
-    // Ö»ĞèÒª¸ø³öµ±Ç°µÄÆåÅÌ¾ÍÄÜÎ¨Ò»È·¶¨µ±Ç°µÄ×´Ì¬£¬ËùÒÔÖ»¶Ô board ×ö hash ¼´¿É.
+    // åªéœ€è¦ç»™å‡ºå½“å‰çš„æ£‹ç›˜å°±èƒ½å”¯ä¸€ç¡®å®šå½“å‰çš„çŠ¶æ€ï¼Œæ‰€ä»¥åªå¯¹ board åš hash å³å¯.
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(board);
     }
 
-    // ·µ»Øµ±Ç°ÆåÅÌ
+    // è¿”å›å½“å‰æ£‹ç›˜
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
