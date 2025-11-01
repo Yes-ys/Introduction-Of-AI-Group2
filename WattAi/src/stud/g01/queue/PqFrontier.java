@@ -3,27 +3,61 @@ package stud.g01.queue;
 import core.solver.queue.Frontier;
 import core.solver.queue.Node;
 import core.solver.queue.EvaluationType;
+
 import stud.g01.utils.NpuzzleHash;
 import core.problem.State;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class PqFrontier extends PriorityQueue<Node> implements Frontier {
-
-    private final NpuzzleHash hashBook;
+/**
+ * 使用哈希去重的Frontier实现
+ */
+public class PqFrontier implements Frontier {
+    private final PriorityQueue<Node> priorityQueue;
+    private final NpuzzleHash stateHash;
     private final EvaluationType type;
+    private final Comparator<Node> comparator;
 
     public PqFrontier(EvaluationType type) {
-        super(Node.evaluator(type));
         this.type = type;
-        this.hashBook = new NpuzzleHash();
+        this.comparator = Node.evaluator(type);
+        this.priorityQueue = new PriorityQueue<>(comparator);
+        this.stateHash = new NpuzzleHash();
+    }
+
+    @Override
+    public Node poll() {
+        return priorityQueue.poll();
+    }
+
+    @Override
+    public void clear() {
+        priorityQueue.clear();
+        stateHash.clear();
+    }
+
+    @Override
+    public int size() {
+        return priorityQueue.size();
+    }
+
+    /**
+     * 获取已探索的状态数量
+     */
+    public int getExploredSize() {
+        return stateHash.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return priorityQueue.isEmpty();
     }
 
     @Override
     public boolean contains(Node node) {
-        // 使用正确的方法名
-        return hashBook.contains(node.getState().toString());
+        String stateStr = node.getState().toString();
+        return stateHash.contains(stateStr);
     }
 
     @Override
@@ -31,8 +65,8 @@ public class PqFrontier extends PriorityQueue<Node> implements Frontier {
         String stateStr = node.getState().toString();
         int currentCost = node.getPathCost();
 
-        // 使用 checkAndUpdate 方法检查并更新哈希表
-        boolean shouldSkip = hashBook.checkAndUpdate(stateStr, currentCost);
+        // 检查并更新哈希表
+        boolean shouldSkip = stateHash.checkAndUpdate(stateStr, currentCost);
 
         if (shouldSkip) {
             // 已存在更优路径，跳过此节点
@@ -43,7 +77,7 @@ public class PqFrontier extends PriorityQueue<Node> implements Frontier {
         removeExistingNode(node.getState());
 
         // 插入新节点
-        return super.offer(node);
+        return priorityQueue.offer(node);
     }
 
     /**
@@ -51,24 +85,19 @@ public class PqFrontier extends PriorityQueue<Node> implements Frontier {
      */
     private void removeExistingNode(State state) {
         String targetStateStr = state.toString();
-        this.removeIf(currentNode ->
+
+        // 直接使用方法引用，避免冗余的局部变量
+        priorityQueue.removeIf(currentNode ->
                 currentNode.getState().toString().equals(targetStateStr)
         );
     }
 
-    /**
-     * 获取评估类型
-     */
-    public EvaluationType getEvaluationType() {
-        return type;
+    @Override
+    public String toString() {
+        return "HashFrontier{" +
+                "type=" + type +
+                ", queueSize=" + priorityQueue.size() +
+                ", exploredStates=" + stateHash.size() +
+                '}';
     }
-//调试
-//    @Override
-//    public String toString() {
-//        return "PqFrontier{" +
-//                "type=" + type +
-//                ", size=" + this.size() +
-//                ", exploredStates=" + hashBook.size() +
-//                '}';
-//    }
 }
