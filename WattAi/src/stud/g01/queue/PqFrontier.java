@@ -28,7 +28,9 @@ public class PqFrontier implements Frontier {
 
     @Override
     public Node poll() {
-        return priorityQueue.poll();
+        Node node = priorityQueue.poll();
+        stateHash.visit(node.getState().toString());
+        return node;
     }
 
     @Override
@@ -60,12 +62,15 @@ public class PqFrontier implements Frontier {
         return stateHash.contains(stateStr);
     }
 
+    // 试图插入新 node，返回是否更新了队列
     @Override
     public boolean offer(Node node) {
+        if(contains(node)) return false;
+
         String stateStr = node.getState().toString();
         int currentCost = node.getPathCost();
 
-        // 检查并更新哈希表
+        // 检查并更新哈希表，返回是否更新frontier
         boolean shouldSkip = stateHash.checkAndUpdate(stateStr, currentCost);
 
         if (shouldSkip) {
