@@ -7,17 +7,17 @@ import java.util.Deque;
 import java.util.List;
 
 /**
- * ËùÓĞÎÊÌâµÄ³éÏó³¬Àà
+ * æ‰€æœ‰é—®é¢˜çš„æŠ½è±¡è¶…ç±»
  * initialState
  * goal
  */
 public abstract class Problem {
-    //³ÉÔ±±äÁ¿
+    //æˆå‘˜å˜é‡
     protected State initialState;
     protected State goal;
-    protected int size;     // ÎÊÌâµÄ¹æÄ££º15-puzzleÎª4£¬PuzzleµÄ±ß³¤£»
-                            // Ñ°Â·ÎÊÌâÎªGridµÄ±ß³¤£»
-                            // Ò°ÈË´«½ÌÊ¿ÎªÒ°ÈËÓë´«½ÌÊ¿µÄÈËÊı
+    protected int size;     // é—®é¢˜çš„è§„æ¨¡ï¼š15-puzzleä¸º4ï¼ŒPuzzleçš„è¾¹é•¿ï¼›
+                            // å¯»è·¯é—®é¢˜ä¸ºGridçš„è¾¹é•¿ï¼›
+                            // é‡äººä¼ æ•™å£«ä¸ºé‡äººä¸ä¼ æ•™å£«çš„äººæ•°
 
     public Problem(State initialState, State goal) {
         this.initialState = initialState;
@@ -30,18 +30,18 @@ public abstract class Problem {
     }
 
     /**
-     * µ±Ç°ÎÊÌâÊÇ·ñÓĞ½â
-     * @return ÓĞ½â£¬true; ÎŞ½â£¬false
+     * å½“å‰é—®é¢˜æ˜¯å¦æœ‰è§£
+     * @return æœ‰è§£ï¼Œtrue; æ— è§£ï¼Œfalse
      *
      */
     public abstract boolean solvable();
 
     /**
-     * ´Ó³õÊ¼×´Ì¬²úÉúËÑË÷Ê÷µÄ¸ù½Úµã
-     * @return µ±Ç°ÎÊÌâµÄ¸ù½áµã
+     * ä»åˆå§‹çŠ¶æ€äº§ç”Ÿæœç´¢æ ‘çš„æ ¹èŠ‚ç‚¹
+     * @return å½“å‰é—®é¢˜çš„æ ¹ç»“ç‚¹
      */
     public final Node root(Predictor predictor){
-        //Ê¹ÓÃpredictor¶Ô³õÊ¼×´Ì¬½øĞĞ¹ÀÖµ
+        //ä½¿ç”¨predictorå¯¹åˆå§‹çŠ¶æ€è¿›è¡Œä¼°å€¼
         int heuristics = predictor.heuristics(initialState, goal);
         return root().setHeuristic(heuristics);
     }
@@ -50,25 +50,25 @@ public abstract class Problem {
         return new Node(initialState, null, null, 0);
     }
     /**
-     * Éú³Énode½ÚµãµÄËùÓĞºÏ·¨µÄºó¼Ì½áµã
-     * @param parent      ¸¸½áµã
+     * ç”ŸæˆnodeèŠ‚ç‚¹çš„æ‰€æœ‰åˆæ³•çš„åç»§ç»“ç‚¹
+     * @param parent      çˆ¶ç»“ç‚¹
      *
-     * @return  parent½áµãµÄËùÓĞ×Ó½áµã
+     * @return  parentç»“ç‚¹çš„æ‰€æœ‰å­ç»“ç‚¹
      */
     public final List<Node> childNodes(Node parent) {
         List<Node> nodes = new ArrayList<>();
-        //¸¸½áµãµÄ×´Ì¬
+        //çˆ¶ç»“ç‚¹çš„çŠ¶æ€
         State parentState = parent.getState();
-        //¶ÔÓÚparentStateÉÏËùÓĞ¿ÉÄÜµÄaction£¬µ«²»ÊÇËùÓĞµÄaction¶¼¿ÉĞĞ
+        //å¯¹äºparentStateä¸Šæ‰€æœ‰å¯èƒ½çš„actionï¼Œä½†ä¸æ˜¯æ‰€æœ‰çš„actionéƒ½å¯è¡Œ
         for (var action : parentState.actions()){
-            //Èç¹û¸¸½áµã×´Ì¬ÏÂµÄ¶¯×÷ÊÇ¿ÉĞĞµÄ
+            //å¦‚æœçˆ¶ç»“ç‚¹çŠ¶æ€ä¸‹çš„åŠ¨ä½œæ˜¯å¯è¡Œçš„
             if (applicable(parentState, action)){
-                //µÃµ½ºó¼Ì×´Ì¬
+                //å¾—åˆ°åç»§çŠ¶æ€
                 State state = parentState.next(action);
-                //¼ÆËãÂ·¾¶³¤¶È = ¸¸½áµãÂ·¾¶³¤¶È + ½øÈëºó¼Ì×´Ì¬Ëù²ÉÈ¡µÄ¶¯×÷µÄ´ú¼Û
+                //è®¡ç®—è·¯å¾„é•¿åº¦ = çˆ¶ç»“ç‚¹è·¯å¾„é•¿åº¦ + è¿›å…¥åç»§çŠ¶æ€æ‰€é‡‡å–çš„åŠ¨ä½œçš„ä»£ä»·
                 int pathCost = parent.getPathCost() + stepCost(state, action);
 
-                //Éú³É×Ó½áµã
+                //ç”Ÿæˆå­ç»“ç‚¹
                 Node child = new Node(state, parent, action, pathCost);
                 nodes.add(child);
             }
@@ -77,15 +77,15 @@ public abstract class Problem {
     }
 
     /**
-     * Éú³Énode½ÚµãµÄËùÓĞºÏ·¨µÄºó¼Ì½áµã£¬²¢Ê¹ÓÃpredictorÔ¤²âÆ÷¶Ôµ±Ç°½Úµã½øĞĞÔ¤²â
-     * @param parent     ¸¸½Úµã
-     * @param predictor  Ô¤²âÆ÷
+     * ç”ŸæˆnodeèŠ‚ç‚¹çš„æ‰€æœ‰åˆæ³•çš„åç»§ç»“ç‚¹ï¼Œå¹¶ä½¿ç”¨predictoré¢„æµ‹å™¨å¯¹å½“å‰èŠ‚ç‚¹è¿›è¡Œé¢„æµ‹
+     * @param parent     çˆ¶èŠ‚ç‚¹
+     * @param predictor  é¢„æµ‹å™¨
      * @return
      */
     public final List<Node> childNodes(Node parent, Predictor predictor) {
         List<Node> nodes = new ArrayList<>();
         for (var node : childNodes(parent)) {
-            //Ê¹ÓÃpredictor¶Ôstate¹ÀÖµ
+            //ä½¿ç”¨predictorå¯¹stateä¼°å€¼
             int heuristics = predictor.heuristics(node.getState(), goal);
             nodes.add(node.setHeuristic(heuristics));
         }
@@ -94,33 +94,33 @@ public abstract class Problem {
 
     /**
      *
-     * @param state     µ±Ç°×´Ì¬
-     * @param action    ½øÈëµ±Ç°×´Ì¬Ëù²ÉÈ¡µÄAction
-     * @return          ½øÈëµ±Ç°×´Ì¬µÄ´ú¼Û
+     * @param state     å½“å‰çŠ¶æ€
+     * @param action    è¿›å…¥å½“å‰çŠ¶æ€æ‰€é‡‡å–çš„Action
+     * @return          è¿›å…¥å½“å‰çŠ¶æ€çš„ä»£ä»·
      */
     public abstract int stepCost(State state, Action action);
 
     /**
-     * ÔÚ×´Ì¬stateÉÏµÄactionÊÇ·ñ¿ÉÓÃ£¿
-     * @param state     µ±Ç°×´Ì¬
-     * @param action    µ±Ç°×´Ì¬ÏÂËù²ÉÓÃµÄ¶¯×÷
-     * @return  true£º¿ÉÓÃ£»false£º²»¿ÉÓÃ
+     * åœ¨çŠ¶æ€stateä¸Šçš„actionæ˜¯å¦å¯ç”¨ï¼Ÿ
+     * @param state     å½“å‰çŠ¶æ€
+     * @param action    å½“å‰çŠ¶æ€ä¸‹æ‰€é‡‡ç”¨çš„åŠ¨ä½œ
+     * @return  trueï¼šå¯ç”¨ï¼›falseï¼šä¸å¯ç”¨
      */
     public abstract boolean applicable(State state, Action action);
 
     /**
-     * ÅĞ¶ÏÄ³¸ö×´Ì¬stateÊÇ·ñµ½´ïÄ¿±ê×´Ì¬£¬¶àÊıÇé¿öÏÂÊÇÅĞ¶Ï¸úÄ¿±ê×´Ì¬ÊÇ·ñÏàµÈ¡£
+     * åˆ¤æ–­æŸä¸ªçŠ¶æ€stateæ˜¯å¦åˆ°è¾¾ç›®æ ‡çŠ¶æ€ï¼Œå¤šæ•°æƒ…å†µä¸‹æ˜¯åˆ¤æ–­è·Ÿç›®æ ‡çŠ¶æ€æ˜¯å¦ç›¸ç­‰ã€‚
      *
-     * @param state ÒªÅĞ¶ÏµÄ×´Ì¬
-     * @return  true£ºÒªÅĞ¶ÏµÄ×´Ì¬ÒÑ¾­ÊÇÄ¿±ê×´Ì¬£»·ñÔò£¬false
+     * @param state è¦åˆ¤æ–­çš„çŠ¶æ€
+     * @return  trueï¼šè¦åˆ¤æ–­çš„çŠ¶æ€å·²ç»æ˜¯ç›®æ ‡çŠ¶æ€ï¼›å¦åˆ™ï¼Œfalse
      */
     public boolean goal(State state){
         return state.equals(goal);
     }
 
     /**
-     * ½âÂ·¾¶µÄ¿ÉÊÓ»¯
-     * @param path ½âÂ·¾¶
+     * è§£è·¯å¾„çš„å¯è§†åŒ–
+     * @param path è§£è·¯å¾„
      */
     public abstract void showSolution(Deque<Node> path);
 }

@@ -1,17 +1,17 @@
 package core.solver.algorithm.heuristic;
 
 public enum HeuristicType {
-    //NpuzzleµÄÆô·¢º¯Êý
-    MISPLACED,  // ²»ÔÚÎ»½«ÅÆ
-    MANHATTAN,  // Âü¹þ¶Ù¾àÀë
+    //Npuzzleçš„å¯å‘å‡½æ•°
+    MISPLACED,  // ä¸åœ¨ä½å°†ç‰Œ
+    MANHATTAN,  // æ›¼å“ˆé¡¿è·ç¦»
     DISJOINT_PATTERN,
 
-    //PathFindingµÄÆô·¢º¯Êý (8·½ÏòµÄÇé¿ö)
-    PF_EUCLID,      // Å·¼¸ÀïµÃ¾àÀë
-    PF_MANHATTAN,   // 8·½ÏòÒÆ¶¯Ê±£¬²»ÊÇadmissibleµÄ
-    PF_GRID,        // ¾¡¿ÉÄÜ×ß¶Ô½ÇÏß£¬È»ºóÆ½ÐÐ×ß£¬>= EUCLID, À©Õ¹½áµãÉÙ
+    //PathFindingçš„å¯å‘å‡½æ•° (8æ–¹å‘çš„æƒ…å†µ)
+    PF_EUCLID,      // æ¬§å‡ é‡Œå¾—è·ç¦»
+    PF_MANHATTAN,   // 8æ–¹å‘ç§»åŠ¨æ—¶ï¼Œä¸æ˜¯admissibleçš„
+    PF_GRID,        // å°½å¯èƒ½èµ°å¯¹è§’çº¿ï¼Œç„¶åŽå¹³è¡Œèµ°ï¼Œ>= EUCLID, æ‰©å±•ç»“ç‚¹å°‘
 
-    //Ò°ÈË´«½ÌÊ¿ÎÊÌâ
-    MC_HARMONY  //È¥µôÒ°ÈË»á³ÔÈËµÄÔ¼Êø
+    //é‡Žäººä¼ æ•™å£«é—®é¢˜
+    MC_HARMONY  //åŽ»æŽ‰é‡Žäººä¼šåƒäººçš„çº¦æŸ
 
 }

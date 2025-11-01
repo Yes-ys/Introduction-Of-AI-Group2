@@ -1,8 +1,8 @@
 package core.problem;
 
 public enum ProblemType {
-    NPUZZLE,            // NPuzzleÎÊÌâ
-    PATHFINDING,        // Ñ°Â·ÎÊÌâ
-    SLIDING_BLOCKS,     // »¬¶¯»ýÄ¾¿éÎÊÌâ
-    MISSIONARY_AND_CARNIVAL //Ò°ÈË´«½ÌÊ¿ÎÊÌâ
+    NPUZZLE,            // NPuzzleé—®é¢˜
+    PATHFINDING,        // å¯»è·¯é—®é¢˜
+    SLIDING_BLOCKS,     // æ»‘åŠ¨ç§¯æœ¨å—é—®é¢˜
+    MISSIONARY_AND_CARNIVAL //é‡Žäººä¼ æ•™å£«é—®é¢˜
 }

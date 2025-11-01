@@ -1,44 +1,44 @@
 package core.solver.queue;
 
 /**
- * Frontier½Ó¿Ú
+ * Frontieræ¥å£
  */
 public interface Frontier {
     /**
-     * È¡³öFrontierÖĞµÄµÚÒ»¸öÔªËØ
+     * å–å‡ºFrontierä¸­çš„ç¬¬ä¸€ä¸ªå…ƒç´ 
      * @return
      */
     Node poll();
 
     /**
-     * Çå¿ÕFrontier
+     * æ¸…ç©ºFrontier
      */
     void clear();
 
     /**
-     * FrontierÖĞÔªËØµÄ¸öÊı
+     * Frontierä¸­å…ƒç´ çš„ä¸ªæ•°
      * @return
      */
     int size();
 
     /**
-     * FrontierÊÇ·ñÎª¿Õ
+     * Frontieræ˜¯å¦ä¸ºç©º
      *
      */
     boolean isEmpty();
 
     /**
-     * FrontierÖĞÊÇ·ñº¬ÓĞ½áµãnode
+     * Frontierä¸­æ˜¯å¦å«æœ‰ç»“ç‚¹node
      * @param node
      * @return
      */
     boolean contains(Node node);
 
     /***
-     * ÔÚFrontierÖĞ²åÈë½áµãnode¡£
-     * Èç¹û²åÈëµÄ½áµã²»ÔÚfrontierÖĞ£¬ÔòÖ±½Ó²åÈë
-     * Èç¹ûFrontierÖĞÒÑ¾­´æÔÚÏàÍ¬×´Ì¬µÄÆäËû½áµã£¬ÔòÉáÆúµô¶şÕßÖ®ÖĞ²»ºÃµÄ¡£
-     * @param node Òª²åÈëµÄ½áµã
+     * åœ¨Frontierä¸­æ’å…¥ç»“ç‚¹nodeã€‚
+     * å¦‚æœæ’å…¥çš„ç»“ç‚¹ä¸åœ¨frontierä¸­ï¼Œåˆ™ç›´æ¥æ’å…¥
+     * å¦‚æœFrontierä¸­å·²ç»å­˜åœ¨ç›¸åŒçŠ¶æ€çš„å…¶ä»–ç»“ç‚¹ï¼Œåˆ™èˆå¼ƒæ‰äºŒè€…ä¹‹ä¸­ä¸å¥½çš„ã€‚
+     * @param node è¦æ’å…¥çš„ç»“ç‚¹
      * @return
      */
     boolean offer(Node node);

@@ -1,12 +1,12 @@
 package core.solver.queue;
 
 /**
- * Best-FirstËÑË÷µÄÈıÀà²»Í¬µÄ¹ÀÖµ²ßÂÔ
- * Í¬Ê±£¬Æô·¢²ßÂÔ£¨hº¯Êı£©ÓÖÓĞ¶àÖÖ¿ÉÄÜ¡£
- * ¶ÔËùÓĞÎÊÌâ¶¼ÊÇÍ¨ÓÃµÄ
+ * Best-Firstæœç´¢çš„ä¸‰ç±»ä¸åŒçš„ä¼°å€¼ç­–ç•¥
+ * åŒæ—¶ï¼Œå¯å‘ç­–ç•¥ï¼ˆhå‡½æ•°ï¼‰åˆæœ‰å¤šç§å¯èƒ½ã€‚
+ * å¯¹æ‰€æœ‰é—®é¢˜éƒ½æ˜¯é€šç”¨çš„
  */
 public enum EvaluationType {
     FULL,       // f = g + h;    Best First
-    PATH_COST,  // f = g; h¡Ô0;   Dijkstra
+    PATH_COST,  // f = g; hâ‰¡0;   Dijkstra
     HEURISTIC   // f = h;        Greedy Best First
 }
