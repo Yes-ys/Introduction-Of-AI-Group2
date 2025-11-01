@@ -22,7 +22,7 @@ public class PqFrontier extends PriorityQueue<Node> implements Frontier {
 
     @Override
     public boolean contains(Node node) {
-        // Ê¹ÓÃÕıÈ·µÄ·½·¨Ãû
+        // ä½¿ç”¨æ­£ç¡®çš„æ–¹æ³•å
         return hashBook.contains(node.getState().toString());
     }
 
@@ -31,23 +31,23 @@ public class PqFrontier extends PriorityQueue<Node> implements Frontier {
         String stateStr = node.getState().toString();
         int currentCost = node.getPathCost();
 
-        // Ê¹ÓÃ checkAndUpdate ·½·¨¼ì²é²¢¸üĞÂ¹şÏ£±í
+        // ä½¿ç”¨ checkAndUpdate æ–¹æ³•æ£€æŸ¥å¹¶æ›´æ–°å“ˆå¸Œè¡¨
         boolean shouldSkip = hashBook.checkAndUpdate(stateStr, currentCost);
 
         if (shouldSkip) {
-            // ÒÑ´æÔÚ¸üÓÅÂ·¾¶£¬Ìø¹ı´Ë½Úµã
+            // å·²å­˜åœ¨æ›´ä¼˜è·¯å¾„ï¼Œè·³è¿‡æ­¤èŠ‚ç‚¹
             return false;
         }
 
-        // Èç¹û¶ÓÁĞÖĞÒÑ´æÔÚÏàÍ¬×´Ì¬µÄ½Úµã£¬ĞèÒªÒÆ³ı¾ÉµÄ
+        // å¦‚æœé˜Ÿåˆ—ä¸­å·²å­˜åœ¨ç›¸åŒçŠ¶æ€çš„èŠ‚ç‚¹ï¼Œéœ€è¦ç§»é™¤æ—§çš„
         removeExistingNode(node.getState());
 
-        // ²åÈëĞÂ½Úµã
+        // æ’å…¥æ–°èŠ‚ç‚¹
         return super.offer(node);
     }
 
     /**
-     * ÒÆ³ı¶ÓÁĞÖĞÖ¸¶¨×´Ì¬µÄ½Úµã
+     * ç§»é™¤é˜Ÿåˆ—ä¸­æŒ‡å®šçŠ¶æ€çš„èŠ‚ç‚¹
      */
     private void removeExistingNode(State state) {
         String targetStateStr = state.toString();
@@ -57,12 +57,12 @@ public class PqFrontier extends PriorityQueue<Node> implements Frontier {
     }
 
     /**
-     * »ñÈ¡ÆÀ¹ÀÀàĞÍ
+     * è·å–è¯„ä¼°ç±»å‹
      */
     public EvaluationType getEvaluationType() {
         return type;
     }
-//µ÷ÊÔ
+//è°ƒè¯•
 //    @Override
 //    public String toString() {
 //        return "PqFrontier{" +
