@@ -1,10 +1,10 @@
 package stud.problem.pathfinding;
 
 public enum GridType {
-    EMPTY('0', 1),  // ©у╣ь
-    GRASS('*', 5),  // ╡щ╣ьё╛м╗╧Щ╣д╢З╪ш╦ъё╛фум╗╢З╪ш╣д5╠╤
-    //MUDDY('~', 7),  // дЮ╣ьё╛м╗╧Щ╢З╪шн╙7╠╤
-    WALL('+', Integer.MAX_VALUE);   // й╞г╫ё╛нч╥╗м╗╧Щ
+    EMPTY('0', 1),  // Г╘╨Е°╟
+    GRASS('*', 5),  // Х█┴Е°╟О╪▄И─ Х©┤Г └Д╩ёД╩╥И╚≤О╪▄Ф≥╝И─ Д╩ёД╩╥Г └5Е─█
+    //MUDDY('~', 7),  // ФЁ╔Е°╟О╪▄И─ Х©┤Д╩ёД╩╥Д╦╨7Е─█
+    WALL('+', Integer.MAX_VALUE);   // Г÷ЁЕ╒≥О╪▄Ф≈═ФЁ∙И─ Х©┤
 
     private final char symbol; 
     private final int magnify;

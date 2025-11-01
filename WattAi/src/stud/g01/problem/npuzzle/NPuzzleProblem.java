@@ -17,15 +17,15 @@ public class NPuzzleProblem extends Problem {
     }
 
     /**
-     * ÅĞ¶Ï NPuzzle ÎÊÌâÊÇ·ñÓĞ½â
+     * åˆ¤æ–­ NPuzzle é—®é¢˜æ˜¯å¦æœ‰è§£
      *
      */
 
     @Override
     public boolean solvable() {
-        // ¼Ù¶¨ initialState ºÍ goal ±ØĞëÊÇ PuzzleBoard
+        // å‡å®š initialState å’Œ goal å¿…é¡»æ˜¯ PuzzleBoard
         if (!(initialState instanceof PuzzleBoard) || !(goal instanceof PuzzleBoard))
-            throw new IllegalArgumentException("initialState ºÍ goal ±ØĞëÊÇ PuzzleBoard");
+            throw new IllegalArgumentException("initialState å’Œ goal å¿…é¡»æ˜¯ PuzzleBoard");
 
         PuzzleBoard ib = (PuzzleBoard) initialState;
         PuzzleBoard gb = (PuzzleBoard) goal;
@@ -36,15 +36,15 @@ public class NPuzzleProblem extends Problem {
     }
 
     /**
-     * ¼ÆËã×´Ì¬µÄ¡°ÆæÅ¼ĞÔÖµ¡±£º
-     * - Èô¿í¶ÈÎªÆæÊı£¬·µ»Ø inversions % 2 = 1
-     * - Èô¿í¶ÈÎªÅ¼Êı£¬·µ»Ø inversions % 2 = 0
+     * è®¡ç®—çŠ¶æ€çš„â€œå¥‡å¶æ€§å€¼â€ï¼š
+     * - è‹¥å®½åº¦ä¸ºå¥‡æ•°ï¼Œè¿”å› inversions % 2 = 1
+     * - è‹¥å®½åº¦ä¸ºå¶æ•°ï¼Œè¿”å› inversions % 2 = 0
      *
      */
     private int parityWithBlank(PuzzleBoard pb) {
         int n = pb.board.length;
 
-        // ½«·Ç¿Õ¸ñµÄÊı×Ö°´ĞĞÓÅÏÈÕ¹Æ½µ½Êı×éÖĞ
+        // å°†éç©ºæ ¼çš„æ•°å­—æŒ‰è¡Œä¼˜å…ˆå±•å¹³åˆ°æ•°ç»„ä¸­
         int[] arr = new int[n * n - 1];
         int idx = 0;
         for (int i = 0; i < n; i++) {
@@ -55,7 +55,7 @@ public class NPuzzleProblem extends Problem {
             }
         }
 
-        // ¼ÆËãµ¹ÖÃÊı£¨inversions£©
+        // è®¡ç®—å€’ç½®æ•°ï¼ˆinversionsï¼‰
         int inversions = 0;
         for (int i = 0; i < idx; i++) {
             for (int j = i + 1; j < idx; j++) {
@@ -74,27 +74,27 @@ public class NPuzzleProblem extends Problem {
     }
 
     /**
-     * ÅĞ¶Ï action ÔÚ state ×´Ì¬ÏÂÊÇ·ñ¿ÉĞĞ
+     * åˆ¤æ–­ action åœ¨ state çŠ¶æ€ä¸‹æ˜¯å¦å¯è¡Œ
      *
      */
     @Override
     public boolean applicable(State state, Action action) {
-        // ÀàĞÍ¼ì²é£ºstate ±ØĞëÊÇ PuzzleBoard£¬action ±ØĞëÊÇ Move
+        // ç±»å‹æ£€æŸ¥ï¼šstate å¿…é¡»æ˜¯ PuzzleBoardï¼Œaction å¿…é¡»æ˜¯ Move
         if (!(state instanceof PuzzleBoard) || !(action instanceof Move))
             return false;
 
         PuzzleBoard pb = (PuzzleBoard) state;
         Direction dir = ((Move) action).getDirection();
 
-        // Direction.offset(dir) ·µ»Ø {colOffset, rowOffset}£¨Óë PuzzleBoard ÖĞµÄÊµÏÖ¶ÔÓ¦£©
+        // Direction.offset(dir) è¿”å› {colOffset, rowOffset}ï¼ˆä¸ PuzzleBoard ä¸­çš„å®ç°å¯¹åº”ï¼‰
         int[] off = Direction.offset(dir);
 
-        // ¼ÆËãÒÆ¶¯ºó¿Õ¸ñÓ¦¸Ãµ½´ïµÄÎ»ÖÃ£¨row, col£©
+        // è®¡ç®—ç§»åŠ¨åç©ºæ ¼åº”è¯¥åˆ°è¾¾çš„ä½ç½®ï¼ˆrow, colï¼‰
         int col = pb.y + off[0];
         int row = pb.x + off[1];
 
         int n = pb.board.length;
-        // ÅĞ¶ÏÄ¿±êÎ»ÖÃÊÇ·ñÔÚÆåÅÌ·¶Î§ÄÚ£¨0..n-1£©
+        // åˆ¤æ–­ç›®æ ‡ä½ç½®æ˜¯å¦åœ¨æ£‹ç›˜èŒƒå›´å†…ï¼ˆ0..n-1ï¼‰
         return row >= 0 && row < n && col >= 0 && col < n;
     }
 
