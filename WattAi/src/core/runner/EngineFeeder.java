@@ -13,70 +13,70 @@ import stud.g01.solver.IdAStar;
 import java.util.ArrayList;
 
 /**
- * ÎªËÑË÷Ëã·¨Ìá¹©¸÷ÑùËØ²Ä¡£°üÀ¨
- *    ÎÊÌâÊµÀıÁĞ±í
- *    Ê¹ÓÃµÄFrontier£¬
- *    Ê¹ÓÃµÄÆô·¢Ê½º¯Êı Predictor£¬
+ * ä¸ºæœç´¢ç®—æ³•æä¾›å„æ ·ç´ æã€‚åŒ…æ‹¬
+ *    é—®é¢˜å®ä¾‹åˆ—è¡¨
+ *    ä½¿ç”¨çš„Frontierï¼Œ
+ *    ä½¿ç”¨çš„å¯å‘å¼å‡½æ•° Predictorï¼Œ
  *
  */
 public abstract class EngineFeeder {
     /**
-     * ¸ù¾İ´æ·ÅÎÊÌâÊäÈëÑùÀıµÄÎÄ±¾ÎÄ¼şµÄÄÚÈİ£¬Éú³ÉÎÊÌâÊµÀıÁĞ±í
-     * @param problemLines  ×Ö·û´®Êı×é£¬´æ·ÅµÄÊÇ£ºÎÊÌâÊäÈëÑùÀıµÄÎÄ±¾ÎÄ¼şµÄÄÚÈİ
+     * æ ¹æ®å­˜æ”¾é—®é¢˜è¾“å…¥æ ·ä¾‹çš„æ–‡æœ¬æ–‡ä»¶çš„å†…å®¹ï¼Œç”Ÿæˆé—®é¢˜å®ä¾‹åˆ—è¡¨
+     * @param problemLines  å­—ç¬¦ä¸²æ•°ç»„ï¼Œå­˜æ”¾çš„æ˜¯ï¼šé—®é¢˜è¾“å…¥æ ·ä¾‹çš„æ–‡æœ¬æ–‡ä»¶çš„å†…å®¹
      * @return
      */
     public abstract ArrayList<Problem> getProblems(ArrayList<String> problemLines);
 
     /**
-     * Éú³É²ÉÈ¡Ä³ÖÖ¹ÀÖµ»úÖÆµÄFrontier£»ÓëÎÊÌâÎŞ¹Ø£¬
+     * ç”Ÿæˆé‡‡å–æŸç§ä¼°å€¼æœºåˆ¶çš„Frontierï¼›ä¸é—®é¢˜æ— å…³ï¼Œ
      *
-     * @param type ½áµãÆÀ¹ÀÆ÷µÄÀàĞÍ
-     * @return Ê¹ÓÃÆÀ¹À»úÖÆµÄÒ»¸öFrontierÊµÀı
+     * @param type ç»“ç‚¹è¯„ä¼°å™¨çš„ç±»å‹
+     * @return ä½¿ç”¨è¯„ä¼°æœºåˆ¶çš„ä¸€ä¸ªFrontierå®ä¾‹
      */
     public abstract Frontier getFrontier(EvaluationType type);
 
     /**
-     * »ñµÃ¶Ô×´Ì¬½øĞĞ¹ÀÖµµÄPredictor£»²»Í¬ÎÊÌâÓĞ²»Í¬µÄ¹ÀÖµº¯Êı
+     * è·å¾—å¯¹çŠ¶æ€è¿›è¡Œä¼°å€¼çš„Predictorï¼›ä¸åŒé—®é¢˜æœ‰ä¸åŒçš„ä¼°å€¼å‡½æ•°
      *
-     * @param type ²»Í¬ÎÊÌâµÄ¹ÀÖµº¯ÊıµÄÀàĞÍ
-     * @return Æô·¢º¯Êı
+     * @param type ä¸åŒé—®é¢˜çš„ä¼°å€¼å‡½æ•°çš„ç±»å‹
+     * @return å¯å‘å‡½æ•°
      */
     // todo: wx
     public abstract Predictor getPredictor(HeuristicType type);
 
     /**
-     * ÓÃÀ´×ö¶Ô±ÈÊµÑéµÄIdAStar £¨Iterative Deepening AStar£¬µü´ú¼ÓÉîµÄAStar£©
+     * ç”¨æ¥åšå¯¹æ¯”å®éªŒçš„IdAStar ï¼ˆIterative Deepening AStarï¼Œè¿­ä»£åŠ æ·±çš„AStarï¼‰
      */
     public final AbstractSearcher getIdaStar(HeuristicType type) {
         Predictor predictor = getPredictor(type);
-        // »ñÈ¡Frontier£¬ÆäNodeÒÔg(n)+h(n)µÄÉıĞòÅÅÁĞ£¬ÏàÍ¬Ê±£¬°´ÕÕg(n)µÄÉıĞòÅÅÁĞ
+        // è·å–Frontierï¼Œå…¶Nodeä»¥g(n)+h(n)çš„å‡åºæ’åˆ—ï¼Œç›¸åŒæ—¶ï¼ŒæŒ‰ç…§g(n)çš„å‡åºæ’åˆ—
         Frontier frontier = new StackFrontier();
-        //Éú³ÉIdAStarÒıÇæ£¨Ëã·¨ÊµÀı£©
+        //ç”ŸæˆIdAStarå¼•æ“ï¼ˆç®—æ³•å®ä¾‹ï¼‰
         return new IdAStar(frontier);
     }
 
     /**
-     * ÓÃÀ´×ö¶Ô±ÈÊµÑéµÄAStar, ¶ÔËùÓĞÎÊÌâ¶¼ÊÇÒ»ÑùµÄ
-     * ¿ÉÅäÖÃÊ¹ÓÃ²»Í¬µÄÆô·¢º¯Êı
-     * @param type ¿ÉÅäÖÃµÄÆô·¢º¯ÊıÀàĞÍ
+     * ç”¨æ¥åšå¯¹æ¯”å®éªŒçš„AStar, å¯¹æ‰€æœ‰é—®é¢˜éƒ½æ˜¯ä¸€æ ·çš„
+     * å¯é…ç½®ä½¿ç”¨ä¸åŒçš„å¯å‘å‡½æ•°
+     * @param type å¯é…ç½®çš„å¯å‘å‡½æ•°ç±»å‹
      */
     public final AbstractSearcher getAStar(HeuristicType type) {
         Predictor predictor = getPredictor(type);
-        // »ñÈ¡Frontier£¬ÆäNodeÒÔg(n)+h(n)µÄÉıĞòÅÅÁĞ£¬ÏàÍ¬Ê±£¬°´ÕÕg(n)µÄÉıĞòÅÅÁĞ
+        // è·å–Frontierï¼Œå…¶Nodeä»¥g(n)+h(n)çš„å‡åºæ’åˆ—ï¼Œç›¸åŒæ—¶ï¼ŒæŒ‰ç…§g(n)çš„å‡åºæ’åˆ—
         Frontier frontier = getFrontier(EvaluationType.FULL);
-        // ¸ù¾İfrontierºÍpredictorÉú³ÉAStarÒıÇæ
+        // æ ¹æ®frontierå’Œpredictorç”ŸæˆAStarå¼•æ“
         return new BestFirstSearcher(frontier, predictor);
     }
 
     /**
-     * ÓÃÀ´×ö¶Ô±ÈÊµÑéµÄDijkstra£¬¶ÔËùÓĞµÄÎÊÌâ¶¼ÊÇÒ»ÑùµÄ
+     * ç”¨æ¥åšå¯¹æ¯”å®éªŒçš„Dijkstraï¼Œå¯¹æ‰€æœ‰çš„é—®é¢˜éƒ½æ˜¯ä¸€æ ·çš„
      * 
-     * @return DijkstraËÑË÷Ëã·¨
+     * @return Dijkstraæœç´¢ç®—æ³•
      */
     public final AbstractSearcher getDijkstra() {
-        // »ñÈ¡Frontier£¬ÆäNodeÒÔg(n)µÄÉıĞòÅÅÁĞ
+        // è·å–Frontierï¼Œå…¶Nodeä»¥g(n)çš„å‡åºæ’åˆ—
         Frontier frontier = getFrontier(EvaluationType.PATH_COST);
-        // predictor£ºh(n)¡Ô0£¬¼´DijkstraËã·¨
+        // predictorï¼šh(n)â‰¡0ï¼Œå³Dijkstraç®—æ³•
         return new BestFirstSearcher(frontier, (state, goal) -> 0);
     }
 }

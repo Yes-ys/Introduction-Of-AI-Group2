@@ -5,23 +5,23 @@ import java.util.List;
 
 /**
  * 
- * åœ°å›¾ä¸­å¯ä»¥ç§»åŠ¨çš„8ä¸ªæ–¹å‘ï¼ŒåŠå…¶ç®­å¤´ç¬¦å·
+ * µØÍ¼ÖĞ¿ÉÒÔÒÆ¶¯µÄ8¸ö·½Ïò£¬¼°Æä¼ıÍ··ûºÅ
  */
 public enum Direction {
-    N('â†‘'),  //åŒ—
-    NE('J'), //ä¸œåŒ—
-    E('â†’'),  //ä¸œ
-    SE('K'), //ä¸œå—
-    S('â†“'),  //å—
-    SW('L'), //è¥¿å—
-    W('â†'),  //è¥¿
-    NW('I'); //è¥¿åŒ—
+    N('¡ü'),  //±±
+    NE('J'), //¶«±±
+    E('¡ú'),  //¶«
+    SE('K'), //¶«ÄÏ
+    S('¡ı'),  //ÄÏ
+    SW('L'), //Î÷ÄÏ
+    W('¡û'),  //Î÷
+    NW('I'); //Î÷±±
 
     private final char symbol;
 
     /**
-     * æ„é€ å‡½æ•°
-     * @param symbol æšä¸¾é¡¹çš„ä»£è¡¨ç¬¦å·--ç®­å¤´
+     * ¹¹Ôìº¯Êı
+     * @param symbol Ã¶¾ÙÏîµÄ´ú±í·ûºÅ--¼ıÍ·
      */
     Direction(char symbol){
         this.symbol = symbol;
@@ -31,26 +31,26 @@ public enum Direction {
         return symbol;
     }
 
-    public static final int SCALE = 10;       //å•å…ƒæ ¼çš„è¾¹é•¿
-    public static final double ROOT2 = 1.4;   //2çš„å¹³æ–¹æ ¹
+    public static final int SCALE = 10;       //µ¥Ôª¸ñµÄ±ß³¤
+    public static final double ROOT2 = 1.4;   //2µÄÆ½·½¸ù
 
     /**
-     * ç§»åŠ¨æ–¹å‘çš„ä¸¤ç§ä¸åŒæƒ…å†µï¼ˆ4ä¸ªæ–¹å‘ï¼Œ8ä¸ªæ–¹å‘ï¼‰ã€‚
+     * ÒÆ¶¯·½ÏòµÄÁ½ÖÖ²»Í¬Çé¿ö£¨4¸ö·½Ïò£¬8¸ö·½Ïò£©¡£
      */
     public static final List<Direction> FOUR_DIRECTIONS = List.of(Direction.N, Direction.E, Direction.S, Direction.W);
     public static final List<Direction> EIGHT_DIRECTIONS = List.of(Direction.values());
     
     /**
-     * ä¸åŒæ–¹å‘çš„è€—æ•£å€¼
+     * ²»Í¬·½ÏòµÄºÄÉ¢Öµ
      */
     public static int cost(Direction dir){
         return FOUR_DIRECTIONS.contains(dir) ? SCALE : (int) (SCALE * ROOT2);
     }
 
-    //å„ä¸ªæ–¹å‘ç§»åŠ¨çš„åæ ‡ä½ç§»é‡
+    //¸÷¸ö·½ÏòÒÆ¶¯µÄ×ø±êÎ»ÒÆÁ¿
     private static final EnumMap<Direction, int[]> DIRECTION_OFFSET = new EnumMap<>(Direction.class);
     static{
-        //åˆ—å·ï¼ˆæˆ–æ¨ªåæ ‡ï¼‰å¢åŠ é‡ï¼›è¡Œå·ï¼ˆæˆ–çºµåæ ‡ï¼‰å¢åŠ é‡
+        //ÁĞºÅ£¨»òºá×ø±ê£©Ôö¼ÓÁ¿£»ĞĞºÅ£¨»ò×İ×ø±ê£©Ôö¼ÓÁ¿
         DIRECTION_OFFSET.put(N, new int[]{0, -1});
         DIRECTION_OFFSET.put(NE, new int[]{1, -1});
         DIRECTION_OFFSET.put(E, new int[]{1, 0});

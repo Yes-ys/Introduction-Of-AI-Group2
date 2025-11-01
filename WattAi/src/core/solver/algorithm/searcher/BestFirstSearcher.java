@@ -9,20 +9,20 @@ import core.solver.queue.Frontier;
 import core.solver.queue.Node;
 
 /**
- * ×î¼ÑÓÅÏÈËÑË÷Ëã·¨¡£ ¸ù¾İ¶ÔFrontierÖĞNodeµÄÅÅĞò·½·¨£¬ÒÔ¼°Ëù²ÉÓÃµÄÆô·¢º¯ÊıµÄ²»Í¬ ¿ÉÒÔÅäÖÃ³ö²»Í¬µÄÌØĞÔµÄËã·¨¡£
- *  Ç°ÌáÌõ¼ş£ºf(n) = g(n) + h(n)£»ÆäÖĞh(n)Âú×ãµ¥µ÷ÏŞÖÆ!  h(n)¡Ô0Ê±£¬DijkstraËã·¨£»g(n)=0Ê±£¬Greedy Best-First
- * finalÀà£¬²»ÄÜ±»¼Ì³ĞµÄÀà¡£Í¬Ñ§ÃÇ²»¿É¸ÄĞ´Õâ¸öÀà£¡£¡
+ * æœ€ä½³ä¼˜å…ˆæœç´¢ç®—æ³•ã€‚ æ ¹æ®å¯¹Frontierä¸­Nodeçš„æ’åºæ–¹æ³•ï¼Œä»¥åŠæ‰€é‡‡ç”¨çš„å¯å‘å‡½æ•°çš„ä¸åŒ å¯ä»¥é…ç½®å‡ºä¸åŒçš„ç‰¹æ€§çš„ç®—æ³•ã€‚
+ *  å‰ææ¡ä»¶ï¼šf(n) = g(n) + h(n)ï¼›å…¶ä¸­h(n)æ»¡è¶³å•è°ƒé™åˆ¶!  h(n)â‰¡0æ—¶ï¼ŒDijkstraç®—æ³•ï¼›g(n)=0æ—¶ï¼ŒGreedy Best-First
+ * finalç±»ï¼Œä¸èƒ½è¢«ç»§æ‰¿çš„ç±»ã€‚åŒå­¦ä»¬ä¸å¯æ”¹å†™è¿™ä¸ªç±»ï¼ï¼
  *
  */
 public final class BestFirstSearcher extends AbstractSearcher {
 
-	private final Predictor predictor; //Ô¤²âÆ÷£¬¶Ôµ±Ç°×´Ì¬½øĞĞÆô·¢Ê½¹ÀÖµ
+	private final Predictor predictor; //é¢„æµ‹å™¨ï¼Œå¯¹å½“å‰çŠ¶æ€è¿›è¡Œå¯å‘å¼ä¼°å€¼
 
 	/**
-	 * ¹¹Ôìº¯Êı
+	 * æ„é€ å‡½æ•°
 	 *
-	 * @param frontier Node¶ÔÏóµÄÒ»¸öÓÅÏÈ¶ÓÁĞ£¬¿ÉÒÔÈ·¶¨Ò»¸ö×´Ì¬Ëù¶ÔÓ¦µÄ½áµãÊÇ·ñÔÚfrontierÖĞ£¬
-	 * @param predictor ¾ßÌåµÄÔ¤²âÆ÷£¨²»ÔÚÎ»½«ÅÆ£¬Âü¹ş¶Ù¾àÀëµÈ£©
+	 * @param frontier Nodeå¯¹è±¡çš„ä¸€ä¸ªä¼˜å…ˆé˜Ÿåˆ—ï¼Œå¯ä»¥ç¡®å®šä¸€ä¸ªçŠ¶æ€æ‰€å¯¹åº”çš„ç»“ç‚¹æ˜¯å¦åœ¨frontierä¸­ï¼Œ
+	 * @param predictor å…·ä½“çš„é¢„æµ‹å™¨ï¼ˆä¸åœ¨ä½å°†ç‰Œï¼Œæ›¼å“ˆé¡¿è·ç¦»ç­‰ï¼‰
 	 */
 	public BestFirstSearcher(Frontier frontier, Predictor predictor) {
 		super(frontier);
@@ -31,42 +31,42 @@ public final class BestFirstSearcher extends AbstractSearcher {
 
 	@Override
 	public Deque<Node> search(Problem problem) {
-		// ÏÈÅĞ¶ÏÎÊÌâÊÇ·ñ¿É½â£¬ÎŞ½âÊ±Ö±½Ó·µ»Ø½âÂ·¾¶Îªnull
+		// å…ˆåˆ¤æ–­é—®é¢˜æ˜¯å¦å¯è§£ï¼Œæ— è§£æ—¶ç›´æ¥è¿”å›è§£è·¯å¾„ä¸ºnull
 		if (!problem.solvable()) {
 			return null;
 		}
 
-		// Ã¿´ÎĞÂµÄËÑË÷¿ªÊ¼Ç°£¬ÏÈÇåÀíµôFrontierºÍExploredµÄÄÚÈİ
+		// æ¯æ¬¡æ–°çš„æœç´¢å¼€å§‹å‰ï¼Œå…ˆæ¸…ç†æ‰Frontierå’ŒExploredçš„å†…å®¹
 		frontier.clear();
 		explored.clear();
 		nodesExpanded = 0;
 		nodesGenerated = 0;
 
-		// ÆğÊ¼½Úµãroot
+		// èµ·å§‹èŠ‚ç‚¹root
 		Node root = problem.root(predictor);
 		frontier.offer(root);
 
-		// ËÑË÷¡£¡£¡£
+		// æœç´¢ã€‚ã€‚ã€‚
 		while (true) {
 
-			if (frontier.isEmpty())  // ÔÚµ½´ïÄ¿±ê×´Ì¬Ö®Ç°frontier±äÎª¿Õ£¬ÔòÎÊÌâÎŞ½â
+			if (frontier.isEmpty())  // åœ¨åˆ°è¾¾ç›®æ ‡çŠ¶æ€ä¹‹å‰frontierå˜ä¸ºç©ºï¼Œåˆ™é—®é¢˜æ— è§£
 				return null;
 
-			Node node = frontier.poll(); // ´ÓÓÅÏÈ¶ÓÁĞfrontierÖĞÈ¡³ö¹ÀÖµ×îĞ¡µÄ½Úµã
+			Node node = frontier.poll(); // ä»ä¼˜å…ˆé˜Ÿåˆ—frontierä¸­å–å‡ºä¼°å€¼æœ€å°çš„èŠ‚ç‚¹
 
-			if (problem.goal(node.getState())) { //½øÈëÄ¿±ê×´Ì¬
+			if (problem.goal(node.getState())) { //è¿›å…¥ç›®æ ‡çŠ¶æ€
 				return generatePath(node);
 			}
 
 			explored.add(node.getState());
 
-			//¶Ô½Úµãnode½øĞĞÀ©Õ¹  Expansion
+			//å¯¹èŠ‚ç‚¹nodeè¿›è¡Œæ‰©å±•  Expansion
 			for (Node child : problem.childNodes(node, predictor)) {
 				nodesGenerated++;
-				if (!expanded(child)) // Èç¹ûĞÂÉú³ÉµÄ½Úµã£¨ĞÂÀ©Õ¹³öµÄ½Úµã£©»¹Ã»ÓĞ±»À©Õ¹£¬Ôò²åÈëµ½frontierÖĞ¡£
-					frontier.offer(child);  //Í¬Ñ§ÃÇ¿ÉÒÔÊÔÒ»ÏÂ£¬
-				       // revisitedÒ²Ò»ÂÉ¼Óµ½FrontierµÄÇé¿ö£¬ºÍÈÓµô²»ºÃµÄÁ½ÖÖÇé¿ö
-				// Èç¹ûÒÑ¾­À©Õ¹¹ı£¬¾ÍÉáÆúµô¡£
+				if (!expanded(child)) // å¦‚æœæ–°ç”Ÿæˆçš„èŠ‚ç‚¹ï¼ˆæ–°æ‰©å±•å‡ºçš„èŠ‚ç‚¹ï¼‰è¿˜æ²¡æœ‰è¢«æ‰©å±•ï¼Œåˆ™æ’å…¥åˆ°frontierä¸­ã€‚
+					frontier.offer(child);  //åŒå­¦ä»¬å¯ä»¥è¯•ä¸€ä¸‹ï¼Œ
+				       // revisitedä¹Ÿä¸€å¾‹åŠ åˆ°Frontierçš„æƒ…å†µï¼Œå’Œæ‰”æ‰ä¸å¥½çš„ä¸¤ç§æƒ…å†µ
+				// å¦‚æœå·²ç»æ‰©å±•è¿‡ï¼Œå°±èˆå¼ƒæ‰ã€‚
 			}
 			nodesExpanded++;
 		}

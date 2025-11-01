@@ -6,6 +6,7 @@ import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
 import core.solver.queue.EvaluationType;
 import core.solver.queue.Frontier;
+import stud.g01.queue.PqFrontier;
 import stud.g01.problem.npuzzle.NPuzzleProblem;
 import stud.g01.problem.npuzzle.PuzzleBoard;
 
@@ -20,6 +21,7 @@ public class PuzzleFeeder extends EngineFeeder {
 
         while (lineNo < problemLines.size()) {
             int size = Integer.parseInt(problemLines.get(lineNo));
+            lineNo++;
             int[][] originBoard = getBoard(problemLines, lineNo, size);
             lineNo += size;
             int[][] targetBoard = getBoard(problemLines, lineNo, size);
@@ -55,12 +57,13 @@ public class PuzzleFeeder extends EngineFeeder {
     // todo: wx
     @Override
     public Frontier getFrontier(EvaluationType type) {
-        return null;
+        PqFrontier frontier = new PqFrontier(type);
+        return frontier;
     }
 
     // todo: wx
     @Override
     public Predictor getPredictor(HeuristicType type) {
-        return null;
+        return PuzzleBoard.predictor(type);
     }
 }

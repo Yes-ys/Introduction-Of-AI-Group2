@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /**
- * Ê¹ÓÃ¹şÏ£È¥ÖØµÄFrontierÊµÏÖ
+ * ä½¿ç”¨å“ˆå¸Œå»é‡çš„Frontierå®ç°
  */
 public class HashFrontier implements Frontier {
     private final PriorityQueue<Node> priorityQueue;
@@ -39,7 +39,7 @@ public class HashFrontier implements Frontier {
     }
 
     /**
-     * »ñÈ¡ÒÑÌ½Ë÷µÄ×´Ì¬ÊıÁ¿
+     * è·å–å·²æ¢ç´¢çš„çŠ¶æ€æ•°é‡
      */
     public int getExploredSize() {
         return stateHash.size();
@@ -61,28 +61,28 @@ public class HashFrontier implements Frontier {
         String stateStr = node.getState().toString();
         int currentCost = node.getPathCost();
 
-        // ¼ì²é²¢¸üĞÂ¹şÏ£±í
+        // æ£€æŸ¥å¹¶æ›´æ–°å“ˆå¸Œè¡¨
         boolean shouldSkip = stateHash.checkAndUpdate(stateStr, currentCost);
 
         if (shouldSkip) {
-            // ÒÑ´æÔÚ¸üÓÅÂ·¾¶£¬Ìø¹ı´Ë½Úµã
+            // å·²å­˜åœ¨æ›´ä¼˜è·¯å¾„ï¼Œè·³è¿‡æ­¤èŠ‚ç‚¹
             return false;
         }
 
-        // Èç¹û¶ÓÁĞÖĞÒÑ´æÔÚÏàÍ¬×´Ì¬µÄ½Úµã£¬ĞèÒªÒÆ³ı¾ÉµÄ
+        // å¦‚æœé˜Ÿåˆ—ä¸­å·²å­˜åœ¨ç›¸åŒçŠ¶æ€çš„èŠ‚ç‚¹ï¼Œéœ€è¦ç§»é™¤æ—§çš„
         removeExistingNode(node.getState());
 
-        // ²åÈëĞÂ½Úµã
+        // æ’å…¥æ–°èŠ‚ç‚¹
         return priorityQueue.offer(node);
     }
 
     /**
-     * ÒÆ³ı¶ÓÁĞÖĞÖ¸¶¨×´Ì¬µÄ½Úµã
+     * ç§»é™¤é˜Ÿåˆ—ä¸­æŒ‡å®šçŠ¶æ€çš„èŠ‚ç‚¹
      */
     private void removeExistingNode(State state) {
         String targetStateStr = state.toString();
 
-        // Ö±½ÓÊ¹ÓÃ·½·¨ÒıÓÃ£¬±ÜÃâÈßÓàµÄ¾Ö²¿±äÁ¿
+        // ç›´æ¥ä½¿ç”¨æ–¹æ³•å¼•ç”¨ï¼Œé¿å…å†—ä½™çš„å±€éƒ¨å˜é‡
         priorityQueue.removeIf(currentNode ->
                 currentNode.getState().toString().equals(targetStateStr)
         );
