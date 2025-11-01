@@ -5,19 +5,19 @@ import java.util.List;
 
 /**
  * 
- * µØÍ¼ÖĞ¿ÉÒÔÒÆ¶¯µÄ8¸ö·½Ïò£¬¼°Æä¼ıÍ··ûºÅ
+ * åœ°å›¾ä¸­å¯ä»¥ç§»åŠ¨çš„8ä¸ªæ–¹å‘ï¼ŒåŠå…¶ç®­å¤´ç¬¦å·
  */
 public enum Direction {
-    N('¡ü'),  //±±
-    E('¡ú'),  //¶«
-    S('¡ı'),  //ÄÏ
-    W('¡û');  //Î÷
+    N('â†‘'),  //åŒ—
+    E('â†’'),  //ä¸œ
+    S('â†“'),  //å—
+    W('â†');  //è¥¿
 
     private final char symbol;
 
     /**
-     * ¹¹Ôìº¯Êı
-     * @param symbol Ã¶¾ÙÏîµÄ´ú±í·ûºÅ--¼ıÍ·
+     * æ„é€ å‡½æ•°
+     * @param symbol æšä¸¾é¡¹çš„ä»£è¡¨ç¬¦å·--ç®­å¤´
      */
     Direction(char symbol){
         this.symbol = symbol;
@@ -28,21 +28,21 @@ public enum Direction {
     }
 
     /**
-     * ÒÆ¶¯·½ÏòµÄ4¸ö·½Ïò¡£
+     * ç§»åŠ¨æ–¹å‘çš„4ä¸ªæ–¹å‘ã€‚
      */
     public static final List<Direction> FOUR_DIRECTIONS = List.of(Direction.values());
     
     /**
-     * ²»Í¬·½ÏòµÄºÄÉ¢Öµ
+     * ä¸åŒæ–¹å‘çš„è€—æ•£å€¼
      */
     public static int cost(Direction dir){
         return 1;
     }
 
-    //¸÷¸ö·½ÏòÒÆ¶¯µÄ×ø±êÎ»ÒÆÁ¿£¬{0, 0} ÔÚ×óÉÏ½Ç
+    //å„ä¸ªæ–¹å‘ç§»åŠ¨çš„åæ ‡ä½ç§»é‡ï¼Œ{0, 0} åœ¨å·¦ä¸Šè§’
     private static final EnumMap<Direction, int[]> DIRECTION_OFFSET = new EnumMap<>(Direction.class);
     static{
-        //ÁĞºÅ£¨»òºá×ø±ê£©Ôö¼ÓÁ¿£»ĞĞºÅ£¨»ò×İ×ø±ê£©Ôö¼ÓÁ¿
+        //åˆ—å·ï¼ˆæˆ–æ¨ªåæ ‡ï¼‰å¢åŠ é‡ï¼›è¡Œå·ï¼ˆæˆ–çºµåæ ‡ï¼‰å¢åŠ é‡
         DIRECTION_OFFSET.put(N, new int[]{0, -1});
         DIRECTION_OFFSET.put(E, new int[]{1, 0});
         DIRECTION_OFFSET.put(S, new int[]{0, 1});

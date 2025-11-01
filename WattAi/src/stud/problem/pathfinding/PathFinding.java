@@ -8,11 +8,11 @@ import core.solver.queue.Node;
 import java.util.Deque;
 
 /**
- * Ñ°Â·ÎÊÌâ
+ * å¯»è·¯é—®é¢˜
  */
 public class PathFinding extends Problem {
 
-    //µØÍ¼ĞÅÏ¢
+    //åœ°å›¾ä¿¡æ¯
     GridType[][] grids;
     public PathFinding(State initialState, State goal){
         this(initialState, goal, 0);
@@ -30,9 +30,9 @@ public class PathFinding extends Problem {
     }
 
     /**
-     * µ±Ç°ÎÊÌâÊÇ·ñÓĞ½â
-     * ÒòÎªÖ»ÓĞÍ¨¹ıËÑË÷À´ÅĞ¶Ï£¬ËùÒÔÏÈÄ¬ÈÏÎªtrue
-     * @return ÓĞ½â£¬true; ÎŞ½â£¬false
+     * å½“å‰é—®é¢˜æ˜¯å¦æœ‰è§£
+     * å› ä¸ºåªæœ‰é€šè¿‡æœç´¢æ¥åˆ¤æ–­ï¼Œæ‰€ä»¥å…ˆé»˜è®¤ä¸ºtrue
+     * @return æœ‰è§£ï¼Œtrue; æ— è§£ï¼Œfalse
      */
     @Override
     public boolean solvable() {
@@ -40,10 +40,10 @@ public class PathFinding extends Problem {
     }
 
     /**
-     * ²İµØºÍÆ½µØµÄºÄÉ¢Öµ²»Í¬
-     * @param state     µ±Ç°×´Ì¬
-     * @param action    ½øÈëµ±Ç°×´Ì¬Ëù²ÉÈ¡µÄAction
-     * @return ¿¼ÂÇµØÃæ×´¿öµÄºÄÉ¢Öµ
+     * è‰åœ°å’Œå¹³åœ°çš„è€—æ•£å€¼ä¸åŒ
+     * @param state     å½“å‰çŠ¶æ€
+     * @param action    è¿›å…¥å½“å‰çŠ¶æ€æ‰€é‡‡å–çš„Action
+     * @return è€ƒè™‘åœ°é¢çŠ¶å†µçš„è€—æ•£å€¼
      */
     @Override
     public int stepCost(State state, Action action) {
@@ -64,9 +64,9 @@ public class PathFinding extends Problem {
 
     @Override
     public void showSolution(Deque<Node> path) {
-        //´òÓ¡Ñ°Â·ÎÊÌâ¡£
-        System.out.println(initialState + "¡ú" + goal);
-        //½«µØÍ¼×ª»»Îª×Ö·ûÊı×é 1->#; 2->*
+        //æ‰“å°å¯»è·¯é—®é¢˜ã€‚
+        System.out.println(initialState + "â†’" + goal);
+        //å°†åœ°å›¾è½¬æ¢ä¸ºå­—ç¬¦æ•°ç»„ 1->#; 2->*
         char[][] grids = new char[size][];
         for (int i = 0; i < size; i++){
             grids[i] = new char[size];
@@ -75,16 +75,16 @@ public class PathFinding extends Problem {
             }
         }
 
-        //±ê¼ÇÆğµã
+        //æ ‡è®°èµ·ç‚¹
         int row = ((Position)initialState).getRow();
         int col = ((Position)initialState).getCol();
         grids[row - 1][col - 1] = '@';
-        //ºÍÖÕµã
+        //å’Œç»ˆç‚¹
         row = ((Position)goal).getRow();
         col = ((Position)goal).getCol();
-        grids[row - 1][col - 1] = '¡Ì';
+        grids[row - 1][col - 1] = 'âˆš';
 
-        //½«½âÂ·¾¶ÖĞµÄ¶¯×÷·ûºÅĞ´Èë×Ö·ûÊı×égrids
+        //å°†è§£è·¯å¾„ä¸­çš„åŠ¨ä½œç¬¦å·å†™å…¥å­—ç¬¦æ•°ç»„grids
         for (Node node : path) {
             Position p = (Position) node.getParent().getState();
             Move move = (Move) node.getAction();
@@ -92,7 +92,7 @@ public class PathFinding extends Problem {
             grids[p.getRow() - 1][p.getCol() - 1] = d.symbol();
         }
 
-        //´òÓ¡×Ö·ûÊı×é
+        //æ‰“å°å­—ç¬¦æ•°ç»„
         drawGrid(grids);
     }
 
