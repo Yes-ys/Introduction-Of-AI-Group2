@@ -7,11 +7,9 @@ import java.util.Map;
  * 改进的NpuzzleHash类，支持存储节点和快速查找
  */
 public class NpuzzleHash {
-    private final Map<String, Boolean> visitedMap;// 闭表
     private final Map<String, Integer> costMap; // 存储frontier中Node的状态对应的最小路径成本
 
     public NpuzzleHash() {
-        visitedMap = new HashMap<>();
         costMap = new HashMap<>();
     }
 
@@ -26,19 +24,20 @@ public class NpuzzleHash {
             int pre_cost = costMap.get(boardStr);
             if(pre_cost > pathCost){
                 costMap.put(boardStr,pathCost);
+                return false;
             }else return true;
         }
         else{
             costMap.put(boardStr,pathCost);
+            return false;
         }
-        return false;
     }
 
     /**
      * 检查状态是否已访问过
      */
     public boolean contains(String boardStr) {
-        return visitedMap.containsKey(boardStr);
+        return costMap.containsKey(boardStr);
     }
 
     /**
@@ -52,7 +51,6 @@ public class NpuzzleHash {
      * 清空哈希表
      */
     public void clear() {
-        visitedMap.clear();
         costMap.clear();
     }
 
@@ -60,11 +58,7 @@ public class NpuzzleHash {
      * 获取已访问状态数量
      */
     public int size() {
-        return visitedMap.size();
-    }
-
-    public void visit(String str){
-        visitedMap.put(str,true);
+        return costMap.size();
     }
 
     public void update_costMap(String str,Integer cost){

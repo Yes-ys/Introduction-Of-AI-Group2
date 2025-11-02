@@ -76,7 +76,7 @@ public final class SearchTester {
         else {
             //NPuzzle问题的第一阶段，使用不在位将牌和曼哈顿距离
             if (step == 1) {
-                heuristics.add(MISPLACED);
+                //heuristics.add(MISPLACED);
                 heuristics.add(MANHATTAN);
             }
             //NPuzzle问题的第三阶段，使用Disjoint Pattern
