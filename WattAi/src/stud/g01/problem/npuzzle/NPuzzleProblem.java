@@ -102,4 +102,5 @@ public class NPuzzleProblem extends Problem {
     public void showSolution(Deque<Node> path) {
 
     }
+
 }

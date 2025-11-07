@@ -75,7 +75,7 @@ public abstract class EngineFeeder {
      */
     public final AbstractSearcher getDijkstra() {
         // 获取Frontier，其Node以g(n)的升序排列
-        Frontier frontier = getFrontier(EvaluationType.PATH_COST);
+        Frontier frontier = getFrontier(EvaluationType.FULL);
         // predictor：h(n)≡0，即Dijkstra算法
         return new BestFirstSearcher(frontier, (state, goal) -> 0);
     }

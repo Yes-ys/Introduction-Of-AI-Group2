@@ -13,6 +13,7 @@ import stud.g01.problem.npuzzle.PuzzleBoard;
 import java.util.ArrayList;
 
 public class PuzzleFeeder extends EngineFeeder {
+    private static final boolean if_mht = true;
     // 将从文件中读取到的字符串 Array 转化为 Problem Array
     @Override
     public ArrayList<Problem> getProblems(ArrayList<String> problemLines) {
@@ -26,17 +27,23 @@ public class PuzzleFeeder extends EngineFeeder {
             lineNo += size;
             int[][] targetBoard = getBoard(problemLines, lineNo, size);
             lineNo += size;
-            NPuzzleProblem problem = getNPuzzleProblem(size, originBoard, targetBoard);
+            NPuzzleProblem problem = getNPuzzleProblem(size,originBoard,targetBoard,if_mht);//测试仅使用mht估值
             problems.add(problem);
         }
         return problems;
     }
 
     // 根据必要的信息初始化一个 NPuzzleProblem 对象
-    public NPuzzleProblem getNPuzzleProblem(int size, int[][] originBoard, int[][] targetBoard) {
-        PuzzleBoard origin = new PuzzleBoard(originBoard);
-        PuzzleBoard target = new PuzzleBoard(targetBoard);
-        return new NPuzzleProblem(origin, target, size);
+    public NPuzzleProblem getNPuzzleProblem(int size, int[][] originBoard, int[][] targetBoard,boolean if_mht) {
+        if(if_mht){
+            PuzzleBoard origin = new PuzzleBoard(originBoard,targetBoard,-1);
+            PuzzleBoard target = new PuzzleBoard(targetBoard,targetBoard,0);
+            return new NPuzzleProblem(origin, target, size);
+        }else{
+            PuzzleBoard origin = new PuzzleBoard(originBoard);
+            PuzzleBoard target = new PuzzleBoard(targetBoard);
+            return new NPuzzleProblem(origin, target, size);
+        }
     }
 
     // 从输入中读取需要的 board
