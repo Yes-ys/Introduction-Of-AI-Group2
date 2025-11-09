@@ -1,16 +1,19 @@
 package stud.g01.utils;
 import java.lang.System;
+import java.util.*;
+import stud.g01.pdb.SQlitePDB;
 
 public class PreProcess {
     private static int size = 4;//不相交数据模式A*处理15puzzle
-    private String[] submodel;//存储3个子模式
+    private static int k = 5; // 每个模式的元素个数
+    private static String[] submodel;//存储3个子模式
 
     public PreProcess(){
         submodel = new String[3];
     }
 
     //检查状态合法性，按照我们的定义，应该存在5个空格作为数据库中标识状态的字符串标识
-    private boolean cheack_valid(String str){
+    private static boolean check_valid(String str){
         int count = 0;
         for(int i = 0;i < str.length();i++){
             if(str.charAt(i) == ' ')count++;
@@ -19,8 +22,8 @@ public class PreProcess {
         else return false;
     }
 
-    private int compute_cost(int No, String str){
-        if(cheack_valid(str)||!(No>=1&&No<=3)){
+    private static int compute_cost(int No, String str){
+        if(check_valid(str)||!(No>=1&&No<=3)){
             System.out.println("非合法的数据库约定状态信息");
             return -1;
         }
@@ -144,11 +147,41 @@ public class PreProcess {
         //待补充...，将boardstate处理一下，得到submodel的三个值
     }
 
+    static void dfs(List<Integer> path, boolean[] used) {
+        if (path.size() == k) {
+            // 输出当前排列的坐标
+            StringBuilder bd = new StringBuilder();
+            for (int e : path){
+                bd.append(e).append(" ");
+            }
+            for (int i = 0; i < 3; i++){
+                submodel[i] = bd.toString();
+                int cost = compute_cost(i + 1, submodel[i]);
+                // 插入数据库
+                InsertPatternId(i + 1, submodel[i], cost);
+            }
+        }
+
+        int N = size * size;
+        for (int i = 0; i < N; i++) {
+            if (!used[i]) {
+                used[i] = true;
+                path.add(i);
+                dfs(path, used);
+                path.removeLast();
+                used[i] = false;
+            }
+        }
+    }
+
     //整个预处理单独作为一个util使用
     public static void main(String[] args) {
         //遍历棋盘所有可能的状态...
         //for(...):trasform_state(boardstate)，计算三个子模式的值；
         //for(i:0~2):int cost += compute_cost(i+1,submodel[i]);//计算各个子模式的cost
         //调用数据库连接接口，存入数据，等ljh完成后，进一步补充
+        List<Integer> path = new ArrayList<>();
+        boolean[] used = new boolean[size * size];
+        dfs(path, used);
     }
 }
