@@ -10,7 +10,7 @@
 .idea/**/usage.statistics.xml
 .idea/dictionaries/
 .idea/shelf/
-.idea/httpRequests/      # �?选，IDEA 使用的本�? http request 存储
+.idea/httpRequests/      # �?选，IDEA 使用的本�? http request 存储
 # But keep project-level settings we might want to share:
 # .idea/codeStyles/
 # .idea/runConfigurations/
@@ -19,7 +19,7 @@
 *.iws
 
 # Build / output
-/out/
+out/
 /target/
 /build/
 
