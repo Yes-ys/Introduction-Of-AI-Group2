@@ -28,7 +28,14 @@ public class PqFrontier implements Frontier {
 
     @Override
     public Node poll() {
-        return priorityQueue.poll();
+        Node nd;
+        while(true){
+            nd = priorityQueue.poll();
+            assert nd != null;
+            String stateStr = nd.getState().toString();
+            if (stateHash.getCost(stateStr) == nd.getPathCost()) break;
+        }
+        return nd;
     }
 
     @Override
@@ -65,17 +72,8 @@ public class PqFrontier implements Frontier {
     public boolean offer(Node node) {
         String stateStr = node.getState().toString();
         int currentCost = node.getPathCost();
-
         // 检查并更新哈希表，返回是否更新frontier
         boolean shouldSkip = stateHash.checkAndUpdate(stateStr, currentCost);
-
-        if (shouldSkip) {
-            // 已存在更优路径，跳过此节点
-            return false;
-        }
-
-        // 如果队列中已存在相同状态的节点，需要移除旧的
-        removeExistingNode(node.getState());
 
         // 插入新节点
         return priorityQueue.offer(node);
