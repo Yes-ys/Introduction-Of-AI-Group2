@@ -15,13 +15,10 @@ public final class SQLitePDB implements AutoCloseable {
     private final String dbPath;
     private final int cacheCapacity;
 
-    // 单一连接
     private Connection conn;
+    private boolean inTransaction = false; // 新增：事务状态
 
-    // 线程安全的简单缓存（使用 synchronized(map) 在需要迭代时保护）
     private final Map<String, Integer> cache = Collections.synchronizedMap(new HashMap<>());
-
-    // 超过 capacity * TRIM_FACTOR 时触发修剪
     private static final double TRIM_FACTOR = 1.2;
 
     public SQLitePDB(String dbPath, int cacheCapacity) {
@@ -63,28 +60,16 @@ public final class SQLitePDB implements AutoCloseable {
             try { conn.close(); } catch (SQLException ignored) {}
             conn = null;
         }
-        synchronized (cache) {
-            cache.clear();
-        }
+        synchronized (cache) { cache.clear(); }
     }
 
-    private Connection conn() {
-        return conn;
-    }
+    private Connection conn() { return conn; }
+    private String cacheKey(int patternId, String key) { return patternId + "|" + key; }
 
-    private String cacheKey(int patternId, String key) {
-        return patternId + "|" + key;
-    }
-
-    /**
-     * 从 cache 读取；未命中则查询 DB 并写回 cache
-     */
     public Integer getCost(int patternId, String key) throws SQLException {
         String ckey = cacheKey(patternId, key);
         Integer cached;
-        synchronized (cache) {
-            cached = cache.get(ckey);
-        }
+        synchronized (cache) { cached = cache.get(ckey); }
         if (cached != null) return cached;
 
         try (PreparedStatement ps = conn().prepareStatement(
@@ -96,15 +81,13 @@ public final class SQLitePDB implements AutoCloseable {
                     int cost = rs.getInt(1);
                     putCacheIfNeeded(ckey, cost);
                     return cost;
-                } else {
-                    return null; // 未找到
-                }
+                } else return null;
             }
         }
     }
 
     /**
-     * 插入或更新 cost（使用 SQLite UPSERT），并更新 cache
+     * 插入或更新 cost（SQLite UPSERT），支持事务
      */
     public void InsertPatternId(int patternId, String key, int cost) throws SQLException {
         try (PreparedStatement ps = conn().prepareStatement(
@@ -118,37 +101,44 @@ public final class SQLitePDB implements AutoCloseable {
         putCacheIfNeeded(cacheKey(patternId, key), cost);
     }
 
-    /**
-     * 检查是否存在某个 key（复用 getCost）
-     */
-    public boolean hasKey(int patternId, String key) throws SQLException {
-        return getCost(patternId, key) != null;
-    }
+    public boolean hasKey(int patternId, String key) throws SQLException { return getCost(patternId, key) != null; }
 
-
-
-    /**
-     * 将值写入 cache；超过阈值时触发修剪
-     */
     private void putCacheIfNeeded(String key, int value) {
         synchronized (cache) {
             cache.put(key, value);
-            if (cache.size() > (int) (cacheCapacity * TRIM_FACTOR)) {
-                trimCache();
-            }
+            if (cache.size() > (int) (cacheCapacity * TRIM_FACTOR)) trimCache();
         }
     }
 
-    /**
-     * 简单修剪：迭代删除部分键直到回到目标容量
-     * 注意：在调用此方法时 caller 应已持有 cache 的监视器
-     */
     private void trimCache() {
         int target = cacheCapacity;
         Iterator<String> it = cache.keySet().iterator();
-        while (cache.size() > target && it.hasNext()) {
-            it.next();
-            it.remove();
+        while (cache.size() > target && it.hasNext()) { it.next(); it.remove(); }
+    }
+
+    public synchronized void beginTransaction() throws SQLException {
+        if (conn == null) throw new SQLException("数据库未打开");
+        if (!inTransaction) {
+            conn.setAutoCommit(false);
+            inTransaction = true;
+        }
+    }
+
+    public synchronized void commit() throws SQLException {
+        if (conn == null) throw new SQLException("数据库未打开");
+        if (inTransaction) {
+            conn.commit();
+            conn.setAutoCommit(true);
+            inTransaction = false;
+        }
+    }
+
+    public synchronized void rollback() throws SQLException {
+        if (conn == null) throw new SQLException("数据库未打开");
+        if (inTransaction) {
+            conn.rollback();
+            conn.setAutoCommit(true);
+            inTransaction = false;
         }
     }
 }
