@@ -10,6 +10,7 @@ import core.solver.algorithm.heuristic.HeuristicType;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Scanner;
@@ -27,7 +28,7 @@ public final class SearchTester {
     //同学们可以根据自己的需要，随意修改。
     public static void main(String[] args) throws ClassNotFoundException,
             NoSuchMethodException, IllegalAccessException,
-            InvocationTargetException, InstantiationException, FileNotFoundException {
+            InvocationTargetException, InstantiationException, FileNotFoundException, SQLException {
 
         //根据args[3]提供的类名生成学生的EngineFeeder对象
         EngineFeeder feeder = (EngineFeeder)
@@ -93,7 +94,7 @@ public final class SearchTester {
      * @param searcher     searcher
      * @param heuristicType 使用哪种启发函数？
      */
-    private static void solveProblems(ArrayList<Problem> problems, AbstractSearcher searcher, HeuristicType heuristicType) {
+    private static void solveProblems(ArrayList<Problem> problems, AbstractSearcher searcher, HeuristicType heuristicType) throws SQLException {
         for (Problem problem : problems) {
             // 使用AStar引擎求解问题
             StopwatchCPU timer1 = new StopwatchCPU();

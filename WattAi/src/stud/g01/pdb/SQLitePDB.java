@@ -141,4 +141,25 @@ public final class SQLitePDB implements AutoCloseable {
             inTransaction = false;
         }
     }
+
+    /**
+     * 查看数据库中的所有条目
+     * @return 数据库中的所有条目列表
+     * @throws SQLException 如果数据库访问错误
+     */
+    public List<Map<String, Object>> viewAllEntries() throws SQLException {
+        if (conn == null) throw new SQLException("数据库未打开");
+        List<Map<String, Object>> entries = new ArrayList<>();
+        try (Statement stmt = conn().createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT pattern_id, key, cost FROM entries")) {
+            while (rs.next()) {
+                Map<String, Object> entry = new HashMap<>();
+                entry.put("pattern_id", rs.getInt("pattern_id"));
+                entry.put("key", rs.getString("key"));
+                entry.put("cost", rs.getInt("cost"));
+                entries.add(entry);
+            }
+        }
+        return entries;
+    }
 }

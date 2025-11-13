@@ -2,6 +2,8 @@ package core.problem;
 
 import core.solver.algorithm.heuristic.Predictor;
 import core.solver.queue.Node;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -40,7 +42,7 @@ public abstract class Problem {
      * 从初始状态产生搜索树的根节点
      * @return 当前问题的根结点
      */
-    public final Node root(Predictor predictor){
+    public final Node root(Predictor predictor) throws SQLException {
         //使用predictor对初始状态进行估值
         int heuristics = predictor.heuristics(initialState, goal);
         return root().setHeuristic(heuristics);
@@ -82,7 +84,7 @@ public abstract class Problem {
      * @param predictor  预测器
      * @return
      */
-    public final List<Node> childNodes(Node parent, Predictor predictor) {
+    public final List<Node> childNodes(Node parent, Predictor predictor) throws SQLException {
         List<Node> nodes = new ArrayList<>();
         for (var node : childNodes(parent)) {
             //使用predictor对state估值

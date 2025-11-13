@@ -5,6 +5,7 @@ import core.problem.State;
 import core.solver.queue.Frontier;
 import core.solver.queue.Node;
 
+import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ public abstract class AbstractSearcher {
         return nodesExpanded;
     }
 
-    public abstract Deque<Node> search(Problem problem);
+    public abstract Deque<Node> search(Problem problem) throws SQLException;
 
     protected Deque<Node> generatePath(Node goal) {
         Deque<Node> stack = new ArrayDeque<>();

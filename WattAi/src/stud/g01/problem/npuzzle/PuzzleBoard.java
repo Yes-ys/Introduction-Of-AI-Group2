@@ -4,13 +4,11 @@ import core.problem.Action;
 import core.problem.State;
 import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
+import stud.g01.pdb.SQLitePDB;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.logging.Level;
 
 import static core.solver.algorithm.heuristic.HeuristicType.*;
 
@@ -25,6 +23,10 @@ public class PuzzleBoard extends State {
     private int manhattan_heuristics;
     private static int[][] GoalBoard = new int[9][2];//目标状态9个数字的坐标，先x后y
     private static boolean if_mht;
+
+    //不相交模式数据库的A*算法用
+    private static final String pdbPath = System.getProperty("user.dir")+"\\WattAi\\data.db";
+    private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
 
     public PuzzleBoard(int[][] b, int x0, int y0){
         this.board = b;
@@ -159,6 +161,7 @@ public class PuzzleBoard extends State {
     static{
         predictors.put(MISPLACED, PuzzleBoard::misplacedTiles);
         predictors.put(MANHATTAN, PuzzleBoard::manhattanDistance);
+        predictors.put(DISJOINT_PATTERN,PuzzleBoard::DisjointPatternDatabase);
     }
 
     public static Predictor predictor(HeuristicType type){
@@ -214,6 +217,69 @@ public class PuzzleBoard extends State {
             return current.manhattan_heuristics;
         }
     }
+
+    private static int DisjointPatternDatabase(State state, State goal) throws SQLException {
+        PuzzleBoard current = (PuzzleBoard) state;
+        int size = current.board.length;
+        if(size != 4)
+            throw new IllegalArgumentException("DisjointPatternDatabase should be used in size of 4");
+        int pdb_heuristics = 0;
+        String[] Patterns = new String[3];
+        for (int i = 0; i < Patterns.length; i++) {
+            Patterns[i] = ""; //初始化Patterns
+        }
+        int[] rowBoard = new int[15];
+        for(int i = 0,j = 0;i < 16;i++)
+        {
+            if(current.board[i/4][i%4] == 0)continue;
+            rowBoard[j] = current.board[i/4][i%4];
+            j++;
+        }
+
+        for(int i = 0;i < 3;i++)
+        {
+            Patterns[i] += "[";
+            for(int j = 0;j < 5;j++)
+            {
+                Patterns[i] += String.valueOf(rowBoard[i*5 + j]);
+                if(j != 4)Patterns[i] += ", ";
+            }
+            Patterns[i] += "]";
+        }
+        try {
+            //System.out.println(pdbPath);
+            pdb.open();
+            for(int patternId = 1;patternId <= 4;patternId++)
+            {
+                String key = Patterns[patternId - 1];
+                System.out.println("key:"+key);
+                System.out.println("PatternId:"+patternId);
+                if (pdb.hasKey(patternId, key)) {
+                    pdb_heuristics += pdb.getCost(patternId,key);
+                } else {
+                    System.out.println("查找失败，模式不存在");
+                }
+            }
+        } catch (Exception e) {
+            try { pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+        } finally {
+            pdb.close();
+        }
+
+//        for debug：打印数据库中内容
+//        try (SQLitePDB pdb = new SQLitePDB(pdbPath, 1024)) {
+//            pdb.open();
+//            List<Map<String, Object>> entries = pdb.viewAllEntries();
+//            for (Map<String, Object> entry : entries) {
+//                System.out.println(entry);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+
+        return pdb_heuristics;
+    }
+
 
     @Override
     public boolean equals(Object obj) {

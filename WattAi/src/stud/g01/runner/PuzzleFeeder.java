@@ -13,7 +13,7 @@ import stud.g01.problem.npuzzle.PuzzleBoard;
 import java.util.ArrayList;
 
 public class PuzzleFeeder extends EngineFeeder {
-    private static final boolean if_mht = true;
+    private static final boolean if_mht = false;
     // 将从文件中读取到的字符串 Array 转化为 Problem Array
     @Override
     public ArrayList<Problem> getProblems(ArrayList<String> problemLines) {

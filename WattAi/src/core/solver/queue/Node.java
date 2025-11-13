@@ -4,6 +4,7 @@ import core.problem.Action;
 import core.problem.State;
 import core.solver.algorithm.heuristic.Predictor;
 
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.EnumMap;
 import static core.solver.queue.EvaluationType.*;
@@ -146,7 +147,7 @@ public final class Node implements Comparable<Node> {
 	 * @param predictor
 	 * @param goal
 	 */
-	public void setHeuristic(Predictor predictor, State goal) {
+	public void setHeuristic(Predictor predictor, State goal) throws SQLException {
 		this.heuristic = predictor.heuristics(this.state, goal);
 	}
 

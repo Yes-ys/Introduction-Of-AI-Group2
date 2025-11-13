@@ -1,5 +1,6 @@
 package core.solver.algorithm.searcher;
 
+import java.sql.SQLException;
 import java.util.*;
 
 import core.problem.Problem;
@@ -30,7 +31,7 @@ public final class BestFirstSearcher extends AbstractSearcher {
 	}
 
 	@Override
-	public Deque<Node> search(Problem problem) {
+	public Deque<Node> search(Problem problem) throws SQLException {
 		// 先判断问题是否可解，无解时直接返回解路径为null
 		if (!problem.solvable()) {
 			return null;
