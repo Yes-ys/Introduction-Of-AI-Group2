@@ -15,6 +15,8 @@ import static core.solver.algorithm.heuristic.HeuristicType.*;
 public class PuzzleBoard extends State {
     int [][] board;
     int x, y;
+    private final int hashcode;
+    private final String tostring;
 
     //维护mht的估值，主要是在创建PuzzleBoard实例的时候修改下面两个成员；
     //于是需要修改用到了PuzzleBoard实例化的函数，主要是构造函数和next函数；
@@ -28,10 +30,17 @@ public class PuzzleBoard extends State {
     private static final String pdbPath = System.getProperty("user.dir")+"\\WattAi\\data.db";
     private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
 
-    public PuzzleBoard(int[][] b, int x0, int y0){
-        this.board = b;
-        this.x = x0;
-        this.y = y0;
+    private String buildToString() {
+        StringBuilder sb = new StringBuilder();
+        for (int[] ints: board) {
+            sb.append(ints[0]);
+            for (int j = 1; j < ints.length; j++) {
+                sb.append(',');
+                sb.append(ints[j]);
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
     }
 
     public PuzzleBoard(int[][] b){
@@ -45,6 +54,8 @@ public class PuzzleBoard extends State {
                 }
             }
         }
+        hashcode = Arrays.deepHashCode(board);
+        tostring = buildToString();
     }
 
     public PuzzleBoard(int[][] cur,int[][] tar, int h){
@@ -107,6 +118,8 @@ public class PuzzleBoard extends State {
         }else{
             throw new RuntimeException("invalid h value means invalid use of constructor!");
         }
+        hashcode = Arrays.deepHashCode(board);
+        tostring = buildToString();
     }
 
     public PuzzleBoard(PuzzleBoard another){
@@ -118,6 +131,8 @@ public class PuzzleBoard extends State {
             System.arraycopy(another.board[i], 0, this.board[i], 0, size);
         }
         this.manhattan_heuristics = another.manhattan_heuristics;
+        this.hashcode = Arrays.deepHashCode(board);
+        this.tostring = buildToString();
     }
 
     @Override
@@ -299,22 +314,10 @@ public class PuzzleBoard extends State {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(board);
-    }
 
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        int size = board.length;
-        for (int[] ints : board) {
-            for (int j = 0; j < size; j++) {
-                sb.append(ints[j]).append(' ');
-            }
-            sb.append('\n');
-        }
-        return sb.toString();
-    }
+    public int hashCode() { return hashcode; }
 
+    @Override
+    public String toString() { return tostring; }
 }
