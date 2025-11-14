@@ -2,6 +2,7 @@ package stud.g01.problem.npuzzle;
 
 import core.problem.Action;
 import core.problem.State;
+import core.runner.SearchTester;
 import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
 import stud.g01.pdb.SQLitePDB;
@@ -27,8 +28,8 @@ public class PuzzleBoard extends State {
     private static boolean if_mht;
 
     //不相交模式数据库的A*算法用
-    private static final String pdbPath = "data.db";
-    private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
+//    private static final String pdbPath = "data.db";
+//    private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
 
     private String buildToString() {
         StringBuilder sb = new StringBuilder();
@@ -270,16 +271,16 @@ public class PuzzleBoard extends State {
             for(int patternId = 1; patternId <= 3; patternId++)
             {
                 String key = Patterns[patternId - 1];
-                System.out.println("key:"+key);
-                System.out.println("PatternId:"+patternId);
-                if (pdb.hasKey(patternId, key)) {
-                    pdb_heuristics += pdb.getCost(patternId, key);
+//                System.out.println("key:"+key);
+//                System.out.println("PatternId:"+patternId);
+                if (SearchTester.pdb.hasKey(patternId, key)) {
+                    pdb_heuristics += SearchTester.pdb.getCost(patternId, key);
                 } else {
                     System.out.println("查找失败，模式不存在");
                 }
             }
         } catch (Exception e) {
-            try { pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            try { SearchTester.pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
 
 //        for debug：打印数据库中内容
