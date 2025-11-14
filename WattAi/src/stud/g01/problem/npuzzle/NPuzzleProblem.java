@@ -47,11 +47,15 @@ public class NPuzzleProblem extends Problem {
         // 将非空格的数字按行优先展平到数组中
         int[] arr = new int[n * n - 1];
         int idx = 0;
+        int blankRow = 0;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (pb.board[i][j] != 0) {
                     arr[idx++] = pb.board[i][j];
+
                 }
+                else{
+                    blankRow = i;}
             }
         }
 
@@ -63,7 +67,8 @@ public class NPuzzleProblem extends Problem {
                     inversions++;
             }
         }
-        inversions = inversions + n;
+
+        inversions = inversions+blankRow+1;//加上空格所在行数
 
         return inversions % 2;
     }
