@@ -23,7 +23,7 @@ public class PuzzleBoard extends State {
     //使用它们进行便捷的mht估值计算，需要修改mht估值函数；
     //是否用mht估值由PuzzleFeeder处确定
     private int manhattan_heuristics;
-    private static int[][] GoalBoard = new int[9][2];//目标状态9个数字的坐标，先x后y
+    private static int[][] GoalBoard = new int[16][2];//目标状态9/16个数字的坐标，先x后y
     private static boolean if_mht;
 
     //不相交模式数据库的A*算法用
