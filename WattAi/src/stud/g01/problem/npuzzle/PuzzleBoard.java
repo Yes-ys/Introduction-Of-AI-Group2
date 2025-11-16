@@ -180,6 +180,7 @@ public class PuzzleBoard extends State {
         predictors.put(MISPLACED, PuzzleBoard::misplacedTiles);
         predictors.put(MANHATTAN, PuzzleBoard::manhattanDistance);
         predictors.put(DISJOINT_PATTERN,PuzzleBoard::DisjointPatternDatabase);
+        predictors.put(LINEAR_CONFLICT, PuzzleBoard::linearConflict);
     }
 
     public static Predictor predictor(HeuristicType type){
@@ -296,6 +297,67 @@ public class PuzzleBoard extends State {
 
         return pdb_heuristics;
     }
+
+    // 计算当前状态到目标状态的 Linear Conflict 距离
+private static int linearConflict(State state, State goal) {
+    PuzzleBoard current = (PuzzleBoard) state;
+    PuzzleBoard target = (PuzzleBoard) goal;
+    int size = current.board.length;
+    int manhattanSum = 0;
+
+    int[][] goalPosition = new int[size * size][2];
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            int value = target.board[i][j];
+            goalPosition[value][0] = i;
+            goalPosition[value][1] = j;
+        }
+    }
+
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            int value = current.board[i][j];
+            if (value != 0) {
+                manhattanSum += Math.abs(i - goalPosition[value][0]) + Math.abs(j - goalPosition[value][1]);
+            }
+        }
+    }
+
+    int linearConflictSum = 0;
+
+    // Check rows for linear conflicts
+    for (int i = 0; i < size; i++) {
+        int max = -1;
+        for (int j = 0; j < size; j++) {
+            int value = current.board[i][j];
+            if (value != 0 && goalPosition[value][0] == i) {
+                if (value > max) {
+                    max = value;
+                } else {
+                    linearConflictSum += 2;
+                }
+            }
+        }
+    }
+
+    // Check columns for linear conflicts
+    for (int j = 0; j < size; j++) {
+        int max = -1;
+        for (int i = 0; i < size; i++) {
+            int value = current.board[i][j];
+            if (value != 0 && goalPosition[value][1] == j) {
+                if (value > max) {
+                    max = value;
+                } else {
+                    linearConflictSum += 2;
+                }
+            }
+        }
+    }
+
+    return manhattanSum + linearConflictSum;
+}
+
 
 
     @Override
