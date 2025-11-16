@@ -15,9 +15,9 @@ import java.util.List;
  */
 public abstract class Problem {
     //成员变量
-    protected State initialState;
-    protected State goal;
-    protected int size;     // 问题的规模：15-puzzle为4，Puzzle的边长；
+    public State initialState;
+    public State goal;
+    public int size;     // 问题的规模：15-puzzle为4，Puzzle的边长；
                             // 寻路问题为Grid的边长；
                             // 野人传教士为野人与传教士的人数
 

@@ -52,7 +52,7 @@ public abstract class EngineFeeder {
         // 获取Frontier，其Node以g(n)+h(n)的升序排列，相同时，按照g(n)的升序排列
         Frontier frontier = new StackFrontier();
         //生成IdAStar引擎（算法实例）
-        return new IdAStar(frontier);
+        return new IdAStar(frontier, predictor);
     }
 
     /**
