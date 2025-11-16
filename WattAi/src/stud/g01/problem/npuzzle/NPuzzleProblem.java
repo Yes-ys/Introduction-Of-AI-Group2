@@ -23,55 +23,61 @@ public class NPuzzleProblem extends Problem {
 
     @Override
     public boolean solvable() {
-        // 假定 initialState 和 goal 必须是 PuzzleBoard
         if (!(initialState instanceof PuzzleBoard) || !(goal instanceof PuzzleBoard))
             throw new IllegalArgumentException("initialState 和 goal 必须是 PuzzleBoard");
 
         PuzzleBoard ib = (PuzzleBoard) initialState;
         PuzzleBoard gb = (PuzzleBoard) goal;
 
-        int parityInit = parityWithBlank(ib);
-        int parityGoal = parityWithBlank(gb);
+        int n = ib.board.length;
+        if (n != gb.board.length)
+            throw new IllegalArgumentException("initial 和 goal 大小必须相同");
+
+        int parityInit = parity(ib);
+        int parityGoal = parity(gb);
         return parityInit == parityGoal;
     }
 
     /**
-     * 计算状态的“奇偶性值”：
-     * - 若宽度为奇数，返回 inversions % 2 = 1
-     * - 若宽度为偶数，返回 inversions % 2 = 0
-     *
+     * 计算状态的“奇偶性”：
+     * - 若宽度为奇数，返回 inversions % 2
+     * - 若宽度为偶数，返回 (inversions + blankRowFromBottom) % 2
      */
-    private int parityWithBlank(PuzzleBoard pb) {
+    private int parity(PuzzleBoard pb) {
         int n = pb.board.length;
 
-        // 将非空格的数字按行优先展平到数组中
-        int[] arr = new int[n * n - 1];
+        // 展平除空格(0)外的数字
+        int m = n * n - 1;
+        int[] arr = new int[m];
         int idx = 0;
-        int blankRow = 0;
+        int blankRowIndex = -1; // 0-based 从上到下
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (pb.board[i][j] != 0) {
-                    arr[idx++] = pb.board[i][j];
-
+                int v = pb.board[i][j];
+                if (v == 0) {
+                    blankRowIndex = i;
+                } else {
+                    arr[idx++] = v;
                 }
-                else{
-                    blankRow = i;}
             }
         }
 
-        // 计算倒置数（inversions）
-        int inversions = 0;
+        // 计算倒置数（naive O(m^2)）
+        long inversions = 0;
         for (int i = 0; i < idx; i++) {
             for (int j = i + 1; j < idx; j++) {
-                if (arr[i] > arr[j])
-                    inversions++;
+                if (arr[i] > arr[j]) inversions++;
             }
         }
 
-        inversions = inversions+blankRow+1;//加上空格所在行数
-
-        return inversions % 2;
+        if (n % 2 == 1) {
+            return (int) (inversions % 2);
+        } else {
+            int blankRowFromBottom = n - blankRowIndex; // 1 表示最底行
+            return (int) ((inversions + blankRowFromBottom) % 2);
+        }
     }
+
 
     @Override
     public int stepCost(State state, Action action) {

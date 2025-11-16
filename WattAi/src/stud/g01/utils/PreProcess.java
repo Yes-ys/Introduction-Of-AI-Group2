@@ -2,7 +2,6 @@ package stud.g01.utils;
 
 import stud.g01.pdb.SQLitePDB;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -120,7 +119,7 @@ public class PreProcess {
             }
 
         } catch (Exception e) {
-            try { pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            pdb.rollback();
             LOGGER.log(Level.SEVERE, "数据库操作失败", e);
         } finally {
             pdb.close();

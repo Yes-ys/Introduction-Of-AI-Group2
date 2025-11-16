@@ -6,7 +6,6 @@ import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
 import stud.g01.pdb.SQLitePDB;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -16,15 +15,15 @@ public class PuzzleBoard extends State {
     int [][] board;
     int x, y;
 
-    //ç»´æŠ¤mhtçš„ä¼°å€¼ï¼Œä¸»è¦æ˜¯åœ¨åˆ›å»ºPuzzleBoardå®ä¾‹çš„æ—¶å€™ä¿®æ”¹ä¸‹é¢ä¸¤ä¸ªæˆå‘˜ï¼›
-    //äºæ˜¯éœ€è¦ä¿®æ”¹ç”¨åˆ°äº†PuzzleBoardå®ä¾‹åŒ–çš„å‡½æ•°ï¼Œä¸»è¦æ˜¯æ„é€ å‡½æ•°å’Œnextå‡½æ•°ï¼›
-    //ä½¿ç”¨å®ƒä»¬è¿›è¡Œä¾¿æ·çš„mhtä¼°å€¼è®¡ç®—ï¼Œéœ€è¦ä¿®æ”¹mhtä¼°å€¼å‡½æ•°ï¼›
-    //æ˜¯å¦ç”¨mhtä¼°å€¼ç”±PuzzleFeederå¤„ç¡®å®š
+    //Î¬»¤mhtµÄ¹ÀÖµ£¬Ö÷ÒªÊÇÔÚ´´½¨PuzzleBoardÊµÀıµÄÊ±ºòĞŞ¸ÄÏÂÃæÁ½¸ö³ÉÔ±£»
+    //ÓÚÊÇĞèÒªĞŞ¸ÄÓÃµ½ÁËPuzzleBoardÊµÀı»¯µÄº¯Êı£¬Ö÷ÒªÊÇ¹¹Ôìº¯ÊıºÍnextº¯Êı£»
+    //Ê¹ÓÃËüÃÇ½øĞĞ±ã½İµÄmht¹ÀÖµ¼ÆËã£¬ĞèÒªĞŞ¸Ämht¹ÀÖµº¯Êı£»
+    //ÊÇ·ñÓÃmht¹ÀÖµÓÉPuzzleFeeder´¦È·¶¨
     private int manhattan_heuristics;
-    private static int[][] GoalBoard = new int[9][2];//ç›®æ ‡çŠ¶æ€9ä¸ªæ•°å­—çš„åæ ‡ï¼Œå…ˆxåy
+    private static int[][] GoalBoard = new int[9][2];//Ä¿±ê×´Ì¬9¸öÊı×ÖµÄ×ø±ê£¬ÏÈxºóy
     private static boolean if_mht;
 
-    //ä¸ç›¸äº¤æ¨¡å¼æ•°æ®åº“çš„A*ç®—æ³•ç”¨
+    //²»Ïà½»Ä£Ê½Êı¾İ¿âµÄA*Ëã·¨ÓÃ
     private static final String pdbPath = System.getProperty("user.dir")+"\\WattAi\\data.db";
     private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
 
@@ -50,7 +49,7 @@ public class PuzzleBoard extends State {
     public PuzzleBoard(int[][] cur,int[][] tar, int h){
         if(h == -1){
             if_mht = true;
-            //åŸºæœ¬çš„åˆå§‹åŒ–
+            //»ù±¾µÄ³õÊ¼»¯
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -61,7 +60,7 @@ public class PuzzleBoard extends State {
                     }
                 }
             }
-            //åˆå§‹åŒ–æ—¶ä¼ å…¥h=-1ï¼Œå¯¹åº”iniéœ€è¦é€šè¿‡éå†è®¡ç®—mhtè·ç¦»
+            //³õÊ¼»¯Ê±´«Èëh=-1£¬¶ÔÓ¦iniĞèÒªÍ¨¹ı±éÀú¼ÆËãmht¾àÀë
             int distance = 0;
             Map<Integer, int[]> targetPositions = new HashMap<>();
             for (int i = 0; i < size; i++) {
@@ -84,7 +83,7 @@ public class PuzzleBoard extends State {
                 }
             }
             manhattan_heuristics = distance;
-            //åˆå§‹åŒ–ç›®æ ‡çŠ¶æ€å„æ•°å­—çš„åæ ‡
+            //³õÊ¼»¯Ä¿±ê×´Ì¬¸÷Êı×ÖµÄ×ø±ê
             for(int i = 0;i < size;i++){
                 for(int j = 0;j < size;j++)
                 {
@@ -93,7 +92,7 @@ public class PuzzleBoard extends State {
                 }
             }
         }else if(h == 0){
-            //åŸºæœ¬çš„åˆå§‹åŒ–
+            //»ù±¾µÄ³õÊ¼»¯
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -139,7 +138,7 @@ public class PuzzleBoard extends State {
         result.x = row;
         result.y = col;
 
-        //xyæ˜¯dest_valç°åœ¨çš„åæ ‡ï¼Œrow colæ˜¯dest_valåŸæ¥çš„åæ ‡
+        //xyÊÇdest_valÏÖÔÚµÄ×ø±ê£¬row colÊÇdest_valÔ­À´µÄ×ø±ê
         if(if_mht){
             result.manhattan_heuristics = manhattan_heuristics -
                     (Math.abs(row-GoalBoard[dest_val][0])+Math.abs(col-GoalBoard[dest_val][1]))+
@@ -156,7 +155,7 @@ public class PuzzleBoard extends State {
         return moves;
     }
 
-    // æšä¸¾æ˜ å°„ï¼Œå­˜æ”¾ä¸åŒç±»å‹çš„å¯å‘å‡½æ•°
+    // Ã¶¾ÙÓ³Éä£¬´æ·Å²»Í¬ÀàĞÍµÄÆô·¢º¯Êı
     private static final EnumMap<HeuristicType, Predictor> predictors = new EnumMap<>(HeuristicType.class);
     static{
         predictors.put(MISPLACED, PuzzleBoard::misplacedTiles);
@@ -168,7 +167,7 @@ public class PuzzleBoard extends State {
         return predictors.get(type);
     }
 
-    // è®¡ç®—å½“å‰çŠ¶æ€åˆ°ç›®æ ‡çŠ¶æ€çš„ Misplaced Tiles è·ç¦»
+    // ¼ÆËãµ±Ç°×´Ì¬µ½Ä¿±ê×´Ì¬µÄ Misplaced Tiles ¾àÀë
     private static int misplacedTiles(State state, State goal) {
         PuzzleBoard current = (PuzzleBoard) state;
         PuzzleBoard target = (PuzzleBoard) goal;
@@ -185,7 +184,7 @@ public class PuzzleBoard extends State {
         return misplacedCount;
     }
 
-    // è®¡ç®—å½“å‰çŠ¶æ€åˆ°ç›®æ ‡çŠ¶æ€çš„ Manhattan è·ç¦»
+    // ¼ÆËãµ±Ç°×´Ì¬µ½Ä¿±ê×´Ì¬µÄ Manhattan ¾àÀë
     private static int manhattanDistance(State state, State goal) {
         if (!if_mht) {
             PuzzleBoard current = (PuzzleBoard) state;
@@ -218,7 +217,7 @@ public class PuzzleBoard extends State {
         }
     }
 
-    private static int DisjointPatternDatabase(State state, State goal) throws SQLException {
+    private static int DisjointPatternDatabase(State state, State goal) {
         PuzzleBoard current = (PuzzleBoard) state;
         int size = current.board.length;
         if(size != 4)
@@ -226,7 +225,7 @@ public class PuzzleBoard extends State {
         int pdb_heuristics = 0;
         String[] Patterns = new String[3];
         for (int i = 0; i < Patterns.length; i++) {
-            Patterns[i] = ""; //åˆå§‹åŒ–Patterns
+            Patterns[i] = ""; //³õÊ¼»¯Patterns
         }
         int[] rowBoard = new int[15];
         for(int i = 0,j = 0;i < 16;i++)
@@ -257,16 +256,16 @@ public class PuzzleBoard extends State {
                 if (pdb.hasKey(patternId, key)) {
                     pdb_heuristics += pdb.getCost(patternId,key);
                 } else {
-                    System.out.println("æŸ¥æ‰¾å¤±è´¥ï¼Œæ¨¡å¼ä¸å­˜åœ¨");
+                    System.out.println("²éÕÒÊ§°Ü£¬Ä£Ê½²»´æÔÚ");
                 }
             }
         } catch (Exception e) {
-            try { pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            pdb.rollback();
         } finally {
             pdb.close();
         }
 
-//        for debugï¼šæ‰“å°æ•°æ®åº“ä¸­å†…å®¹
+//        for debug£º´òÓ¡Êı¾İ¿âÖĞÄÚÈİ
 //        try (SQLitePDB pdb = new SQLitePDB(pdbPath, 1024)) {
 //            pdb.open();
 //            List<Map<String, Object>> entries = pdb.viewAllEntries();

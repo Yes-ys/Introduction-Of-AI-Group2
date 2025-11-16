@@ -2,7 +2,6 @@ package core.solver.algorithm.heuristic;
 
 import core.problem.State;
 
-import java.sql.SQLException;
 
 /**
  *  预测器接口
@@ -17,5 +16,5 @@ public interface Predictor {
      *      goal  目标状态
      * @return 该状态到目标状态的启发值
      */
-    int heuristics(State state, State goal) throws SQLException;
+    int heuristics(State state, State goal);
 }
