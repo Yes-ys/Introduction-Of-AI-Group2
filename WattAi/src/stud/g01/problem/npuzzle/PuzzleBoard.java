@@ -2,6 +2,7 @@ package stud.g01.problem.npuzzle;
 
 import core.problem.Action;
 import core.problem.State;
+import core.runner.SearchTester;
 import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
 import stud.g01.pdb.SQLitePDB;
@@ -14,23 +15,32 @@ import static core.solver.algorithm.heuristic.HeuristicType.*;
 public class PuzzleBoard extends State {
     int [][] board;
     int x, y;
+    private final int hashcode;
+    private final String tostring;
 
-    //Î¬»¤mhtµÄ¹ÀÖµ£¬Ö÷ÒªÊÇÔÚ´´½¨PuzzleBoardÊµÀıµÄÊ±ºòĞŞ¸ÄÏÂÃæÁ½¸ö³ÉÔ±£»
-    //ÓÚÊÇĞèÒªĞŞ¸ÄÓÃµ½ÁËPuzzleBoardÊµÀı»¯µÄº¯Êı£¬Ö÷ÒªÊÇ¹¹Ôìº¯ÊıºÍnextº¯Êı£»
-    //Ê¹ÓÃËüÃÇ½øĞĞ±ã½İµÄmht¹ÀÖµ¼ÆËã£¬ĞèÒªĞŞ¸Ämht¹ÀÖµº¯Êı£»
-    //ÊÇ·ñÓÃmht¹ÀÖµÓÉPuzzleFeeder´¦È·¶¨
+    //Î¬ï¿½ï¿½mhtï¿½Ä¹ï¿½Öµï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½PuzzleBoardÊµï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ş¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ş¸ï¿½ï¿½Ãµï¿½ï¿½ï¿½PuzzleBoardÊµï¿½ï¿½ï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ç¹ï¿½ï¿½ìº¯ï¿½ï¿½ï¿½ï¿½nextï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    //Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½Ç½ï¿½ï¿½Ğ±ï¿½İµï¿½mhtï¿½ï¿½Öµï¿½ï¿½ï¿½ã£¬ï¿½ï¿½Òªï¿½Ş¸ï¿½mhtï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    //ï¿½Ç·ï¿½ï¿½ï¿½mhtï¿½ï¿½Öµï¿½ï¿½PuzzleFeederï¿½ï¿½È·ï¿½ï¿½
     private int manhattan_heuristics;
-    private static int[][] GoalBoard = new int[9][2];//Ä¿±ê×´Ì¬9¸öÊı×ÖµÄ×ø±ê£¬ÏÈxºóy
+    private static int[][] GoalBoard = new int[16][2];//ç›®æ ‡çŠ¶æ€9/16ä¸ªæ•°å­—çš„åæ ‡ï¼Œå…ˆxåy
     private static boolean if_mht;
 
-    //²»Ïà½»Ä£Ê½Êı¾İ¿âµÄA*Ëã·¨ÓÃ
-    private static final String pdbPath = System.getProperty("user.dir")+"\\WattAi\\data.db";
-    private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
+    //ä¸ç›¸äº¤æ¨¡å¼æ•°æ®åº“çš„A*ç®—æ³•ç”¨
+//    private static final String pdbPath = "data.db";
+//    private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
 
-    public PuzzleBoard(int[][] b, int x0, int y0){
-        this.board = b;
-        this.x = x0;
-        this.y = y0;
+    private String buildToString() {
+        StringBuilder sb = new StringBuilder();
+        for (int[] ints: board) {
+            sb.append(ints[0]);
+            for (int j = 1; j < ints.length; j++) {
+                sb.append(',');
+                sb.append(ints[j]);
+            }
+            sb.append('\n');
+        }
+        return sb.toString();
     }
 
     public PuzzleBoard(int[][] b){
@@ -44,12 +54,14 @@ public class PuzzleBoard extends State {
                 }
             }
         }
+        hashcode = Arrays.deepHashCode(board);
+        tostring = buildToString();
     }
 
     public PuzzleBoard(int[][] cur,int[][] tar, int h){
         if(h == -1){
             if_mht = true;
-            //»ù±¾µÄ³õÊ¼»¯
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½Ê¼ï¿½ï¿½
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -60,7 +72,7 @@ public class PuzzleBoard extends State {
                     }
                 }
             }
-            //³õÊ¼»¯Ê±´«Èëh=-1£¬¶ÔÓ¦iniĞèÒªÍ¨¹ı±éÀú¼ÆËãmht¾àÀë
+            //ï¿½ï¿½Ê¼ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½h=-1ï¿½ï¿½ï¿½ï¿½Ó¦iniï¿½ï¿½ÒªÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½mhtï¿½ï¿½ï¿½ï¿½
             int distance = 0;
             Map<Integer, int[]> targetPositions = new HashMap<>();
             for (int i = 0; i < size; i++) {
@@ -83,7 +95,7 @@ public class PuzzleBoard extends State {
                 }
             }
             manhattan_heuristics = distance;
-            //³õÊ¼»¯Ä¿±ê×´Ì¬¸÷Êı×ÖµÄ×ø±ê
+            //ï¿½ï¿½Ê¼ï¿½ï¿½Ä¿ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½
             for(int i = 0;i < size;i++){
                 for(int j = 0;j < size;j++)
                 {
@@ -92,7 +104,7 @@ public class PuzzleBoard extends State {
                 }
             }
         }else if(h == 0){
-            //»ù±¾µÄ³õÊ¼»¯
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½Ê¼ï¿½ï¿½
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -106,6 +118,8 @@ public class PuzzleBoard extends State {
         }else{
             throw new RuntimeException("invalid h value means invalid use of constructor!");
         }
+        hashcode = Arrays.deepHashCode(board);
+        tostring = buildToString();
     }
 
     public PuzzleBoard(PuzzleBoard another){
@@ -117,6 +131,8 @@ public class PuzzleBoard extends State {
             System.arraycopy(another.board[i], 0, this.board[i], 0, size);
         }
         this.manhattan_heuristics = another.manhattan_heuristics;
+        this.hashcode = Arrays.deepHashCode(board);
+        this.tostring = buildToString();
     }
 
     @Override
@@ -131,14 +147,16 @@ public class PuzzleBoard extends State {
         int col = y + offsets[0];
         int row = x + offsets[1];
         int dest_val = board[row][col];
+        int [][] new_board = new int[this.board.length][];
+        for (int i = 0; i < this.board.length; i++) {
+            new_board[i] = Arrays.copyOf(this.board[i], this.board[i].length);
+        }
 
-        PuzzleBoard result = new PuzzleBoard(this);
-        result.board[row][col] = 0;
-        result.board[x][y] = dest_val;
-        result.x = row;
-        result.y = col;
+        new_board[row][col] = 0;
+        new_board[x][y] = dest_val;
+        PuzzleBoard result = new PuzzleBoard(new_board);
 
-        //xyÊÇdest_valÏÖÔÚµÄ×ø±ê£¬row colÊÇdest_valÔ­À´µÄ×ø±ê
+        //xyï¿½ï¿½dest_valï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ê£¬row colï¿½ï¿½dest_valÔ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if(if_mht){
             result.manhattan_heuristics = manhattan_heuristics -
                     (Math.abs(row-GoalBoard[dest_val][0])+Math.abs(col-GoalBoard[dest_val][1]))+
@@ -155,7 +173,7 @@ public class PuzzleBoard extends State {
         return moves;
     }
 
-    // Ã¶¾ÙÓ³Éä£¬´æ·Å²»Í¬ÀàĞÍµÄÆô·¢º¯Êı
+    // Ã¶ï¿½ï¿½Ó³ï¿½ä£¬ï¿½ï¿½Å²ï¿½Í¬ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     private static final EnumMap<HeuristicType, Predictor> predictors = new EnumMap<>(HeuristicType.class);
     static{
         predictors.put(MISPLACED, PuzzleBoard::misplacedTiles);
@@ -167,7 +185,7 @@ public class PuzzleBoard extends State {
         return predictors.get(type);
     }
 
-    // ¼ÆËãµ±Ç°×´Ì¬µ½Ä¿±ê×´Ì¬µÄ Misplaced Tiles ¾àÀë
+    // ï¿½ï¿½ï¿½ãµ±Ç°×´Ì¬ï¿½ï¿½Ä¿ï¿½ï¿½×´Ì¬ï¿½ï¿½ Misplaced Tiles ï¿½ï¿½ï¿½ï¿½
     private static int misplacedTiles(State state, State goal) {
         PuzzleBoard current = (PuzzleBoard) state;
         PuzzleBoard target = (PuzzleBoard) goal;
@@ -184,7 +202,7 @@ public class PuzzleBoard extends State {
         return misplacedCount;
     }
 
-    // ¼ÆËãµ±Ç°×´Ì¬µ½Ä¿±ê×´Ì¬µÄ Manhattan ¾àÀë
+    // ï¿½ï¿½ï¿½ãµ±Ç°×´Ì¬ï¿½ï¿½Ä¿ï¿½ï¿½×´Ì¬ï¿½ï¿½ Manhattan ï¿½ï¿½ï¿½ï¿½
     private static int manhattanDistance(State state, State goal) {
         if (!if_mht) {
             PuzzleBoard current = (PuzzleBoard) state;
@@ -222,17 +240,17 @@ public class PuzzleBoard extends State {
         int size = current.board.length;
         if(size != 4)
             throw new IllegalArgumentException("DisjointPatternDatabase should be used in size of 4");
-        int pdb_heuristics = 0;
+
         String[] Patterns = new String[3];
         for (int i = 0; i < Patterns.length; i++) {
-            Patterns[i] = ""; //³õÊ¼»¯Patterns
+            Patterns[i] = ""; //ï¿½ï¿½Ê¼ï¿½ï¿½Patterns
         }
-        int[] rowBoard = new int[15];
-        for(int i = 0,j = 0;i < 16;i++)
+        int[] rowBoard = new int[15]; // rowBoard[i]ï¼ši + 1 å‡ºç°çš„ä½ç½®
+        for(int i = 0;i < 16;i++)
         {
-            if(current.board[i/4][i%4] == 0)continue;
-            rowBoard[j] = current.board[i/4][i%4];
-            j++;
+            int num = current.board[i/4][i%4];
+            if(num == 0) continue;
+            rowBoard[num - 1] = i;
         }
 
         for(int i = 0;i < 3;i++)
@@ -245,27 +263,26 @@ public class PuzzleBoard extends State {
             }
             Patterns[i] += "]";
         }
+
+        int pdb_heuristics = 0;
         try {
             //System.out.println(pdbPath);
-            pdb.open();
-            for(int patternId = 1;patternId <= 4;patternId++)
+            for(int patternId = 1; patternId <= 3; patternId++)
             {
                 String key = Patterns[patternId - 1];
-                System.out.println("key:"+key);
-                System.out.println("PatternId:"+patternId);
-                if (pdb.hasKey(patternId, key)) {
-                    pdb_heuristics += pdb.getCost(patternId,key);
+//                System.out.println("key:"+key);
+//                System.out.println("PatternId:"+patternId);
+                if (SearchTester.pdb.hasKey(patternId, key)) {
+                    pdb_heuristics += SearchTester.pdb.getCost(patternId, key);
                 } else {
-                    System.out.println("²éÕÒÊ§°Ü£¬Ä£Ê½²»´æÔÚ");
+                    System.out.println("ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
                 }
             }
         } catch (Exception e) {
-            pdb.rollback();
-        } finally {
-            pdb.close();
+            SearchTester.pdb.rollback();
         }
 
-//        for debug£º´òÓ¡Êı¾İ¿âÖĞÄÚÈİ
+//        for debugï¿½ï¿½ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½İ¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //        try (SQLitePDB pdb = new SQLitePDB(pdbPath, 1024)) {
 //            pdb.open();
 //            List<Map<String, Object>> entries = pdb.viewAllEntries();
@@ -298,22 +315,10 @@ public class PuzzleBoard extends State {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(board);
-    }
 
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        int size = board.length;
-        for (int[] ints : board) {
-            for (int j = 0; j < size; j++) {
-                sb.append(ints[j]).append(' ');
-            }
-            sb.append('\n');
-        }
-        return sb.toString();
-    }
+    public int hashCode() { return hashcode; }
 
+    @Override
+    public String toString() { return tostring; }
 }

@@ -109,9 +109,32 @@ public class NPuzzleProblem extends Problem {
         return row >= 0 && row < n && col >= 0 && col < n;
     }
 
+    static java.io.PrintStream out;
+    static {
+        try{
+            out = new java.io.PrintStream("display-ir");
+        } catch (java.io.FileNotFoundException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
     @Override
     public void showSolution(Deque<Node> path) {
-
+        for (var node: path) {
+            PuzzleBoard pb = (PuzzleBoard) node.getState();
+            int L = pb.board.length;
+            //pb.draw();
+            for (int[] row: pb.board) {
+                out.print(row[0]);
+                for (int i = 1; i < L; i++) {
+                    out.print(',');
+                    out.print(row[i]);
+                }
+                out.println();
+            }
+            out.print('*');
+        }
     }
 
 }

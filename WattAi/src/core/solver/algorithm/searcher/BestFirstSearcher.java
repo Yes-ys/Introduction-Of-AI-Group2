@@ -33,9 +33,9 @@ public final class BestFirstSearcher extends AbstractSearcher {
 	public Deque<Node> search(Problem problem)  {
 
 		// 先判断问题是否可解，无解时直接返回解路径为null
-		if (!problem.solvable()) {
-			return null;
-		}
+//		if (!problem.solvable()) {
+//			return null;
+//		}
 
 		// 每次新的搜索开始前，先清理掉Frontier和Explored的内容
 		frontier.clear();
@@ -54,7 +54,7 @@ public final class BestFirstSearcher extends AbstractSearcher {
 				return null;
 
 			Node node = frontier.poll(); // 从优先队列frontier中取出估值最小的节点
-
+//            System.out.println("当前 f 值: " + (node.getPathCost() + node.getHeuristic()));
 			if (problem.goal(node.getState())) { //进入目标状态
 				return generatePath(node);
 			}
@@ -63,11 +63,10 @@ public final class BestFirstSearcher extends AbstractSearcher {
 
 			//对节点node进行扩展  Expansion
 			for (Node child : problem.childNodes(node, predictor)) {
-				nodesGenerated++;
-				if (!expanded(child)) // 如果新生成的节点（新扩展出的节点）还没有被扩展，则插入到frontier中。
-					frontier.offer(child);  //同学们可以试一下，
-				       // revisited也一律加到Frontier的情况，和扔掉不好的两种情况
-				// 如果已经扩展过，就舍弃掉。
+				if (!expanded(child)) { // 如果新生成的节点（新扩展出的节点）还没有被扩展，则插入到frontier中。
+                    if (frontier.offer(child))
+                        nodesGenerated++;
+                }
 			}
 			nodesExpanded++;
 		}
