@@ -25,23 +25,30 @@ public final class SQLitePDB implements AutoCloseable {
         this.dbPath = Objects.requireNonNull(dbPath, "dbPath 不能为空");
         this.cacheCapacity = Math.max(1024, cacheCapacity);
     }
+    private void handleSQLException(SQLException e) {
+        throw new RuntimeException("数据库操作失败: " + e.getMessage(), e);
+    }
 
     private Connection createConnection() throws SQLException {
         String url = "jdbc:sqlite:" + dbPath;
-        Connection c = DriverManager.getConnection(url);
-        try (Statement s = c.createStatement()) {
-            s.execute("PRAGMA journal_mode=WAL;");
-            s.execute("PRAGMA synchronous=NORMAL;");
-            s.execute("PRAGMA temp_store=MEMORY;");
-            s.execute("PRAGMA busy_timeout=5000;");
-        }
+            Connection c = DriverManager.getConnection(url);
+            try (Statement s = c.createStatement()) {
+                s.execute("PRAGMA journal_mode=WAL;");
+                s.execute("PRAGMA synchronous=NORMAL;");
+                s.execute("PRAGMA temp_store=MEMORY;");
+                s.execute("PRAGMA busy_timeout=5000;");
+            }
         return c;
     }
 
-    public synchronized void open() throws SQLException {
-        if (conn != null && !conn.isClosed()) return;
-        conn = createConnection();
-        ensureSchema(conn);
+    public synchronized void open()  {
+        try {
+            if (conn != null && !conn.isClosed()) return;
+            conn = createConnection();
+            ensureSchema(conn);
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
     }
 
     private void ensureSchema(Connection c) throws SQLException {
@@ -66,39 +73,46 @@ public final class SQLitePDB implements AutoCloseable {
     private Connection conn() { return conn; }
     private String cacheKey(int patternId, String key) { return patternId + "|" + key; }
 
-    public Integer getCost(int patternId, String key) throws SQLException {
+    public Integer getCost(int patternId, String key) {
         String ckey = cacheKey(patternId, key);
         Integer cached;
-        synchronized (cache) { cached = cache.get(ckey); }
+        synchronized (cache) {
+            cached = cache.get(ckey);
+        }
         if (cached != null) return cached;
-
-        try (PreparedStatement ps = conn().prepareStatement(
-                "SELECT cost FROM entries WHERE pattern_id = ? AND key = ?")) {
-            ps.setInt(1, patternId);
-            ps.setString(2, key);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int cost = rs.getInt(1);
-                    putCacheIfNeeded(ckey, cost);
-                    return cost;
-                } else return null;
+        try {
+            try (PreparedStatement ps = conn().prepareStatement(
+                    "SELECT cost FROM entries WHERE pattern_id = ? AND key = ?")) {
+                ps.setInt(1, patternId);
+                ps.setString(2, key);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int cost = rs.getInt(1);
+                        putCacheIfNeeded(ckey, cost);
+                        return cost;
+                    } else return null;
+                }
             }
+        }catch (SQLException e) {
+            handleSQLException(e);
+            return null; // unreachable
         }
     }
 
     /**
      * 插入或更新 cost（SQLite UPSERT），支持事务
      */
-    public void InsertPatternId(int patternId, String key, int cost) throws SQLException {
-        try (PreparedStatement ps = conn().prepareStatement(
-                "INSERT INTO entries (pattern_id, key, cost) VALUES (?, ?, ?)" +
-                        " ON CONFLICT(pattern_id, key) DO UPDATE SET cost = excluded.cost")) {
-            ps.setInt(1, patternId);
-            ps.setString(2, key);
-            ps.setInt(3, cost);
-            ps.executeUpdate();
-        }
-        putCacheIfNeeded(cacheKey(patternId, key), cost);
+    public void InsertPatternId(int patternId, String key, int cost) {
+        try {
+            try (PreparedStatement ps = conn().prepareStatement(
+                    "INSERT INTO entries (pattern_id, key, cost) VALUES (?, ?, ?)" +
+                            " ON CONFLICT(pattern_id, key) DO UPDATE SET cost = excluded.cost")) {
+                ps.setInt(1, patternId);
+                ps.setString(2, key);
+                ps.setInt(3, cost);
+                ps.executeUpdate();
+            }
+        }catch (SQLException e) {handleSQLException(e);}
     }
 
     public boolean hasKey(int patternId, String key) throws SQLException { return getCost(patternId, key) != null; }
@@ -116,36 +130,43 @@ public final class SQLitePDB implements AutoCloseable {
         while (cache.size() > target && it.hasNext()) { it.next(); it.remove(); }
     }
 
-    public synchronized void beginTransaction() throws SQLException {
-        if (conn == null) throw new SQLException("数据库未打开");
-        if (!inTransaction) {
-            conn.setAutoCommit(false);
-            inTransaction = true;
-        }
+    public synchronized void beginTransaction(){
+        try {
+            if (conn == null) throw new SQLException("数据库未打开");
+            if (!inTransaction) {
+                conn.setAutoCommit(false);
+                inTransaction = true;
+            }
+        }catch (SQLException e) {handleSQLException(e);}
     }
 
-    public synchronized void commit() throws SQLException {
-        if (conn == null) throw new SQLException("数据库未打开");
-        if (inTransaction) {
-            conn.commit();
-            conn.setAutoCommit(true);
-            inTransaction = false;
-        }
+    public synchronized void commit() {
+        try {
+            if (conn == null) throw new SQLException("数据库未打开");
+            if (inTransaction) {
+                conn.commit();
+                conn.setAutoCommit(true);
+                inTransaction = false;
+            }
+        }catch (SQLException e) {handleSQLException(e);}
     }
 
-    public synchronized void rollback() throws SQLException {
-        if (conn == null) throw new SQLException("数据库未打开");
-        if (inTransaction) {
-            conn.rollback();
-            conn.setAutoCommit(true);
-            inTransaction = false;
-        }
+    public synchronized void rollback() {
+        try {
+            if (conn == null) throw new SQLException("数据库未打开");
+            if (inTransaction) {
+                conn.rollback();
+                conn.setAutoCommit(true);
+                inTransaction = false;
+            }
+        }catch (SQLException e) {handleSQLException(e);}
     }
 
     /**
      * 查看数据库中的所有条目
      * @return 数据库中的所有条目列表
      * @throws SQLException 如果数据库访问错误
+     *
      */
     public List<Map<String, Object>> viewAllEntries() throws SQLException {
         if (conn == null) throw new SQLException("数据库未打开");

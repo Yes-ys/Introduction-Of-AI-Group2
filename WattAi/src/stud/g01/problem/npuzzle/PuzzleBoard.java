@@ -7,7 +7,6 @@ import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
 import stud.g01.pdb.SQLitePDB;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -19,10 +18,10 @@ public class PuzzleBoard extends State {
     private final int hashcode;
     private final String tostring;
 
-    //维护mht的估值，主要是在创建PuzzleBoard实例的时候修改下面两个成员；
-    //于是需要修改用到了PuzzleBoard实例化的函数，主要是构造函数和next函数；
-    //使用它们进行便捷的mht估值计算，需要修改mht估值函数；
-    //是否用mht估值由PuzzleFeeder处确定
+    //ά��mht�Ĺ�ֵ����Ҫ���ڴ���PuzzleBoardʵ����ʱ���޸�����������Ա��
+    //������Ҫ�޸��õ���PuzzleBoardʵ�����ĺ�������Ҫ�ǹ��캯����next������
+    //ʹ�����ǽ��б�ݵ�mht��ֵ���㣬��Ҫ�޸�mht��ֵ������
+    //�Ƿ���mht��ֵ��PuzzleFeeder��ȷ��
     private int manhattan_heuristics;
     private static int[][] GoalBoard = new int[16][2];//目标状态9/16个数字的坐标，先x后y
     private static boolean if_mht;
@@ -62,7 +61,7 @@ public class PuzzleBoard extends State {
     public PuzzleBoard(int[][] cur,int[][] tar, int h){
         if(h == -1){
             if_mht = true;
-            //基本的初始化
+            //�����ĳ�ʼ��
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -73,7 +72,7 @@ public class PuzzleBoard extends State {
                     }
                 }
             }
-            //初始化时传入h=-1，对应ini需要通过遍历计算mht距离
+            //��ʼ��ʱ����h=-1����Ӧini��Ҫͨ����������mht����
             int distance = 0;
             Map<Integer, int[]> targetPositions = new HashMap<>();
             for (int i = 0; i < size; i++) {
@@ -96,7 +95,7 @@ public class PuzzleBoard extends State {
                 }
             }
             manhattan_heuristics = distance;
-            //初始化目标状态各数字的坐标
+            //��ʼ��Ŀ��״̬�����ֵ�����
             for(int i = 0;i < size;i++){
                 for(int j = 0;j < size;j++)
                 {
@@ -105,7 +104,7 @@ public class PuzzleBoard extends State {
                 }
             }
         }else if(h == 0){
-            //基本的初始化
+            //�����ĳ�ʼ��
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -157,7 +156,7 @@ public class PuzzleBoard extends State {
         new_board[x][y] = dest_val;
         PuzzleBoard result = new PuzzleBoard(new_board);
 
-        //xy是dest_val现在的坐标，row col是dest_val原来的坐标
+        //xy��dest_val���ڵ����꣬row col��dest_valԭ��������
         if(if_mht){
             result.manhattan_heuristics = manhattan_heuristics -
                     (Math.abs(row-GoalBoard[dest_val][0])+Math.abs(col-GoalBoard[dest_val][1]))+
@@ -174,7 +173,7 @@ public class PuzzleBoard extends State {
         return moves;
     }
 
-    // 枚举映射，存放不同类型的启发函数
+    // ö��ӳ�䣬��Ų�ͬ���͵���������
     private static final EnumMap<HeuristicType, Predictor> predictors = new EnumMap<>(HeuristicType.class);
     static{
         predictors.put(MISPLACED, PuzzleBoard::misplacedTiles);
@@ -186,7 +185,7 @@ public class PuzzleBoard extends State {
         return predictors.get(type);
     }
 
-    // 计算当前状态到目标状态的 Misplaced Tiles 距离
+    // ���㵱ǰ״̬��Ŀ��״̬�� Misplaced Tiles ����
     private static int misplacedTiles(State state, State goal) {
         PuzzleBoard current = (PuzzleBoard) state;
         PuzzleBoard target = (PuzzleBoard) goal;
@@ -203,7 +202,7 @@ public class PuzzleBoard extends State {
         return misplacedCount;
     }
 
-    // 计算当前状态到目标状态的 Manhattan 距离
+    // ���㵱ǰ״̬��Ŀ��״̬�� Manhattan ����
     private static int manhattanDistance(State state, State goal) {
         if (!if_mht) {
             PuzzleBoard current = (PuzzleBoard) state;
@@ -236,7 +235,7 @@ public class PuzzleBoard extends State {
         }
     }
 
-    private static int DisjointPatternDatabase(State state, State goal) throws SQLException {
+    private static int DisjointPatternDatabase(State state, State goal) {
         PuzzleBoard current = (PuzzleBoard) state;
         int size = current.board.length;
         if(size != 4)
@@ -244,7 +243,7 @@ public class PuzzleBoard extends State {
 
         String[] Patterns = new String[3];
         for (int i = 0; i < Patterns.length; i++) {
-            Patterns[i] = ""; //初始化Patterns
+            Patterns[i] = ""; //��ʼ��Patterns
         }
         int[] rowBoard = new int[15]; // rowBoard[i]：i + 1 出现的位置
         for(int i = 0;i < 16;i++)
@@ -276,14 +275,14 @@ public class PuzzleBoard extends State {
                 if (SearchTester.pdb.hasKey(patternId, key)) {
                     pdb_heuristics += SearchTester.pdb.getCost(patternId, key);
                 } else {
-                    System.out.println("查找失败，模式不存在");
+                    System.out.println("����ʧ�ܣ�ģʽ������");
                 }
             }
         } catch (Exception e) {
-            try { SearchTester.pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            SearchTester.pdb.rollback();
         }
 
-//        for debug：打印数据库中内容
+//        for debug����ӡ���ݿ�������
 //        try (SQLitePDB pdb = new SQLitePDB(pdbPath, 1024)) {
 //            pdb.open();
 //            List<Map<String, Object>> entries = pdb.viewAllEntries();
