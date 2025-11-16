@@ -62,7 +62,7 @@ public final class SearchTester {
         for (HeuristicType heuristicType : heuristics) { 
             //solveProblems方法根据不同启发函数生成不同的searcher
             //从Feeder获取所使用的搜索引擎（AStar，IDAStar等），     
-            solveProblems(problems, feeder.getAStar(heuristicType), heuristicType);
+            solveProblems(problems, feeder.getIdaStar(heuristicType), heuristicType);
             System.out.println();
         }
 
