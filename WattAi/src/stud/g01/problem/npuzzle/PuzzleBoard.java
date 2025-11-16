@@ -2,6 +2,7 @@ package stud.g01.problem.npuzzle;
 
 import core.problem.Action;
 import core.problem.State;
+import core.runner.SearchTester;
 import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
 import stud.g01.pdb.SQLitePDB;
@@ -27,8 +28,8 @@ public class PuzzleBoard extends State {
     private static boolean if_mht;
 
     //不相交模式数据库的A*算法用
-    private static final String pdbPath = System.getProperty("user.dir")+"\\WattAi\\data.db";
-    private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
+//    private static final String pdbPath = "data.db";
+//    private static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
 
     private String buildToString() {
         StringBuilder sb = new StringBuilder();
@@ -147,12 +148,14 @@ public class PuzzleBoard extends State {
         int col = y + offsets[0];
         int row = x + offsets[1];
         int dest_val = board[row][col];
+        int [][] new_board = new int[this.board.length][];
+        for (int i = 0; i < this.board.length; i++) {
+            new_board[i] = Arrays.copyOf(this.board[i], this.board[i].length);
+        }
 
-        PuzzleBoard result = new PuzzleBoard(this);
-        result.board[row][col] = 0;
-        result.board[x][y] = dest_val;
-        result.x = row;
-        result.y = col;
+        new_board[row][col] = 0;
+        new_board[x][y] = dest_val;
+        PuzzleBoard result = new PuzzleBoard(new_board);
 
         //xy是dest_val现在的坐标，row col是dest_val原来的坐标
         if(if_mht){
@@ -238,17 +241,17 @@ public class PuzzleBoard extends State {
         int size = current.board.length;
         if(size != 4)
             throw new IllegalArgumentException("DisjointPatternDatabase should be used in size of 4");
-        int pdb_heuristics = 0;
+
         String[] Patterns = new String[3];
         for (int i = 0; i < Patterns.length; i++) {
             Patterns[i] = ""; //初始化Patterns
         }
-        int[] rowBoard = new int[15];
-        for(int i = 0,j = 0;i < 16;i++)
+        int[] rowBoard = new int[15]; // rowBoard[i]：i + 1 出现的位置
+        for(int i = 0;i < 16;i++)
         {
-            if(current.board[i/4][i%4] == 0)continue;
-            rowBoard[j] = current.board[i/4][i%4];
-            j++;
+            int num = current.board[i/4][i%4];
+            if(num == 0) continue;
+            rowBoard[num - 1] = i;
         }
 
         for(int i = 0;i < 3;i++)
@@ -261,24 +264,23 @@ public class PuzzleBoard extends State {
             }
             Patterns[i] += "]";
         }
+
+        int pdb_heuristics = 0;
         try {
             //System.out.println(pdbPath);
-            pdb.open();
-            for(int patternId = 1;patternId <= 4;patternId++)
+            for(int patternId = 1; patternId <= 3; patternId++)
             {
                 String key = Patterns[patternId - 1];
-                System.out.println("key:"+key);
-                System.out.println("PatternId:"+patternId);
-                if (pdb.hasKey(patternId, key)) {
-                    pdb_heuristics += pdb.getCost(patternId,key);
+//                System.out.println("key:"+key);
+//                System.out.println("PatternId:"+patternId);
+                if (SearchTester.pdb.hasKey(patternId, key)) {
+                    pdb_heuristics += SearchTester.pdb.getCost(patternId, key);
                 } else {
                     System.out.println("查找失败，模式不存在");
                 }
             }
         } catch (Exception e) {
-            try { pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-        } finally {
-            pdb.close();
+            try { SearchTester.pdb.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
 
 //        for debug：打印数据库中内容

@@ -6,6 +6,7 @@ import core.problem.ProblemType;
 import core.solver.algorithm.searcher.AbstractSearcher;
 import core.solver.queue.Node;
 import core.solver.algorithm.heuristic.HeuristicType;
+import stud.g01.pdb.SQLitePDB;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,6 +26,8 @@ import static core.solver.algorithm.heuristic.HeuristicType.*;
  * arg3: 各小组的Feeder   stud.runner.WalkerFeeder
  */
 public final class SearchTester {
+    public static final String pdbPath = "data.db";
+    public static final SQLitePDB pdb = new SQLitePDB(pdbPath,1024);
     //同学们可以根据自己的需要，随意修改。
     public static void main(String[] args) throws ClassNotFoundException,
             NoSuchMethodException, IllegalAccessException,
@@ -48,6 +51,10 @@ public final class SearchTester {
         //任务第几阶段 args[2]
         int step = Integer.parseInt(args[2]);
 
+        if (type == ProblemType.NPUZZLE && step == 3){
+            pdb.open();
+        }
+
         //根据问题类型和当前阶段，获取所有启发函数的类型
         //寻路问题分别使用Grid距离和Euclid距离作为启发函数
         ArrayList<HeuristicType> heuristics = getHeuristicTypes(type, step);
@@ -57,6 +64,10 @@ public final class SearchTester {
             //从Feeder获取所使用的搜索引擎（AStar，IDAStar等），     
             solveProblems(problems, feeder.getAStar(heuristicType), heuristicType);
             System.out.println();
+        }
+
+        if (type == ProblemType.NPUZZLE && step == 3){
+            pdb.close();
         }
     }
 

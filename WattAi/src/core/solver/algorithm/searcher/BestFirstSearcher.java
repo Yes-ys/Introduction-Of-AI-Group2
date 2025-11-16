@@ -54,7 +54,7 @@ public final class BestFirstSearcher extends AbstractSearcher {
 				return null;
 
 			Node node = frontier.poll(); // 从优先队列frontier中取出估值最小的节点
-
+            System.out.println("当前 f 值: " + (node.getPathCost() + node.getHeuristic()));
 			if (problem.goal(node.getState())) { //进入目标状态
 				return generatePath(node);
 			}

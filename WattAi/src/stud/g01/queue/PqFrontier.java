@@ -73,10 +73,12 @@ public class PqFrontier implements Frontier {
         String stateStr = node.getState().toString();
         int currentCost = node.getPathCost();
         // 检查并更新哈希表，返回是否更新frontier
-        boolean shouldSkip = stateHash.checkAndUpdate(stateStr, currentCost);
+        boolean updated = stateHash.checkAndUpdate(stateStr, currentCost);
 
         // 插入新节点
-        return priorityQueue.offer(node);
+        if (updated)
+            return priorityQueue.offer(node);
+        else return false;
     }
 
     /**
