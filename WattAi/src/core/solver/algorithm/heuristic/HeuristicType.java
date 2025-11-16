@@ -5,6 +5,7 @@ public enum HeuristicType {
     MISPLACED,  // 不在位将牌
     MANHATTAN,  // 曼哈顿距离
     DISJOINT_PATTERN,//不相交的模式数据库
+    LINEAR_CONFLICT, //线性冲突启发函数
 
     //PathFinding的启发函数 (8方向的情况)
     PF_EUCLID,      // 欧几里得距离
