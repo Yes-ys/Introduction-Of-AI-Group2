@@ -61,14 +61,12 @@ public class PuzzleFeeder extends EngineFeeder {
         return map;
     }
 
-    // todo: wx
     @Override
     public Frontier getFrontier(EvaluationType type) {
         PqFrontier frontier = new PqFrontier(type);
         return frontier;
     }
 
-    // todo: wx
     @Override
     public Predictor getPredictor(HeuristicType type) {
         return PuzzleBoard.predictor(type);

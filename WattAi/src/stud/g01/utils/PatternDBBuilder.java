@@ -24,9 +24,6 @@ public class PatternDBBuilder {
             {8,13},{9,12,14},{10,13,15},{11,14}
     };
 
-    // ----------------------------
-    // 公共接口
-    // ----------------------------
     public void buildAll(SQLitePDB pdb) throws Exception {
         pdb.open();
         pdb.beginTransaction();
@@ -39,9 +36,6 @@ public class PatternDBBuilder {
         pdb.close();
     }
 
-    // ----------------------------
-    // 构建单个 pattern（压缩状态 BFS）
-    // ----------------------------
     // 当前子问题模式 - pattenId，数据库对象 - pdb
     private void buildOne(int patternId, SQLitePDB pdb) throws Exception {
         int[] tiles = PATTERNS[patternId - 1];
@@ -150,10 +144,6 @@ public class PatternDBBuilder {
         pdb.commit();
     }
 
-    // ----------------------------
-    // 状态压缩为 long：只编码 pattern tile 位置
-    // 每个位置 4 bit，可编码 0~15
-    // ----------------------------
     public static long encode(int[] pos) {
         long code = 0;
         for (int p : pos) {

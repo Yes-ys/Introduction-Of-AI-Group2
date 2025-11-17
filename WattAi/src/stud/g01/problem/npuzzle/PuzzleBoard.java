@@ -16,10 +16,6 @@ public class PuzzleBoard extends State {
     private final int hashcode;
     private final String tostring;
 
-    //ά��mht�Ĺ�ֵ����Ҫ���ڴ���PuzzleBoardʵ����ʱ���޸�����������Ա��
-    //������Ҫ�޸��õ���PuzzleBoardʵ�����ĺ�������Ҫ�ǹ��캯����next������
-    //ʹ�����ǽ��б�ݵ�mht��ֵ���㣬��Ҫ�޸�mht��ֵ������
-    //�Ƿ���mht��ֵ��PuzzleFeeder��ȷ��
     private int manhattan_heuristics;
     private static final int[][] GoalBoard = new int[16][2];//目标状态9/16个数字的坐标，先x后y
     private static boolean if_mht;
@@ -64,7 +60,6 @@ public class PuzzleBoard extends State {
     public PuzzleBoard(int[][] cur,int[][] tar, int h){
         if(h == -1){
             if_mht = true;
-            //�����ĳ�ʼ��
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -75,7 +70,6 @@ public class PuzzleBoard extends State {
                     }
                 }
             }
-            //��ʼ��ʱ����h=-1����Ӧini��Ҫͨ����������mht����
             int distance = 0;
             Map<Integer, int[]> targetPositions = new HashMap<>();
             for (int i = 0; i < size; i++) {
@@ -98,7 +92,6 @@ public class PuzzleBoard extends State {
                 }
             }
             manhattan_heuristics = distance;
-            //��ʼ��Ŀ��״̬�����ֵ�����
             for(int i = 0;i < size;i++){
                 for(int j = 0;j < size;j++)
                 {
@@ -159,7 +152,6 @@ public class PuzzleBoard extends State {
         new_board[x][y] = dest_val;
         PuzzleBoard result = new PuzzleBoard(new_board);
 
-        //xy��dest_val���ڵ����꣬row col��dest_valԭ��������
         if(if_mht){
             result.manhattan_heuristics = manhattan_heuristics -
                     (Math.abs(row-GoalBoard[dest_val][0])+Math.abs(col-GoalBoard[dest_val][1]))+
@@ -176,7 +168,6 @@ public class PuzzleBoard extends State {
         return moves;
     }
 
-    // ö��ӳ�䣬��Ų�ͬ���͵���������
     private static final EnumMap<HeuristicType, Predictor> predictors = new EnumMap<>(HeuristicType.class);
     static{
         predictors.put(MISPLACED, PuzzleBoard::misplacedTiles);
@@ -257,7 +248,7 @@ public class PuzzleBoard extends State {
 
         String[] Patterns = new String[3];
         for (int i = 0; i < Patterns.length; i++) {
-            Patterns[i] = ""; //��ʼ��Patterns
+            Patterns[i] = ""; // 初始化 Patterns
         }
         int[] rowBoard = new int[16]; // rowBoard[i]：i 出现的位置
         for(int i = 0;i < 16;i++)
@@ -265,17 +256,6 @@ public class PuzzleBoard extends State {
             int num = current.board[i/4][i%4];
             rowBoard[num] = i;
         }
-
-//        for(int i = 0;i < 3;i++)
-//        {
-//            Patterns[i] += "[";
-//            for(int j = 0; j < PATTERNS[i].length; j++)
-//            {
-//                Patterns[i] += String.valueOf(rowBoard[i * 5 + j]);
-//                if(j != PATTERNS[i].length - 1)Patterns[i] += ", ";
-//            }
-//            Patterns[i] += "]";
-//        }
 
         for (int i = 0; i < 3; i++)
         {
@@ -288,30 +268,17 @@ public class PuzzleBoard extends State {
             for(int patternId = 1; patternId <= 3; patternId++)
             {
                 String key = Patterns[patternId - 1];
-//                System.out.println("key:"+key);
-//                System.out.println("PatternId:"+patternId);
                 if (SearchTester.pdb.hasKey(patternId, key)) {
                     pdb_heuristics += SearchTester.pdb.getCost(patternId, key);
                 } else {
-                    System.out.println("����ʧ�ܣ�ģʽ������");
+                    System.out.println("查找错误");
                 }
             }
         } catch (Exception e) {
             SearchTester.pdb.rollback();
         }
 
-//        for debug����ӡ���ݿ�������
-//        try (SQLitePDB pdb = new SQLitePDB(pdbPath, 1024)) {
-//            pdb.open();
-//            List<Map<String, Object>> entries = pdb.viewAllEntries();
-//            for (Map<String, Object> entry : entries) {
-//                System.out.println(entry);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
         return Math.max(pdb_heuristics, linearConflict(state, goal));
-//        return pdb_heuristics;
     }
 
     // 计算线性冲突数量
@@ -359,61 +326,6 @@ public class PuzzleBoard extends State {
     }
     // 计算当前状态到目标状态的 Linear Conflict 距离
 private static int linearConflict(State state, State goal) {
-//    PuzzleBoard current = (PuzzleBoard) state;
-//    PuzzleBoard target = (PuzzleBoard) goal;
-//    int size = current.board.length;
-//    int manhattanSum = 0;
-//
-//    int[][] goalPosition = new int[size * size][2];
-//    for (int i = 0; i < size; i++) {
-//        for (int j = 0; j < size; j++) {
-//            int value = target.board[i][j];
-//            goalPosition[value][0] = i;
-//            goalPosition[value][1] = j;
-//        }
-//    }
-//
-//    for (int i = 0; i < size; i++) {
-//        for (int j = 0; j < size; j++) {
-//            int value = current.board[i][j];
-//            if (value != 0) {
-//                manhattanSum += Math.abs(i - goalPosition[value][0]) + Math.abs(j - goalPosition[value][1]);
-//            }
-//        }
-//    }
-//
-//    int linearConflictSum = 0;
-//
-//    // Check rows for linear conflicts
-//    for (int i = 0; i < size; i++) {
-//        int max = -1;
-//        for (int j = 0; j < size; j++) {
-//            int value = current.board[i][j];
-//            if (value != 0 && goalPosition[value][0] == i) {
-//                if (value > max) {
-//                    max = value;
-//                } else {
-//                    linearConflictSum += 2;
-//                }
-//            }
-//        }
-//    }
-//
-//    // Check columns for linear conflicts
-//    for (int j = 0; j < size; j++) {
-//        int max = -1;
-//        for (int i = 0; i < size; i++) {
-//            int value = current.board[i][j];
-//            if (value != 0 && goalPosition[value][1] == j) {
-//                if (value > max) {
-//                    max = value;
-//                } else {
-//                    linearConflictSum += 2;
-//                }
-//            }
-//        }
-//    }
-
     return manhattanDistance(state, goal) + 2 * nLinearConflicts(state,goal);
 }
 

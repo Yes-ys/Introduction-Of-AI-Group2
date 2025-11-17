@@ -51,6 +51,7 @@ public final class SearchTester {
         int step = Integer.parseInt(args[2]);
 
         if (type == ProblemType.NPUZZLE && step == 3){
+            SQLitePDB.loadAllToMemory("data.db");
             pdb.open();
         }
 

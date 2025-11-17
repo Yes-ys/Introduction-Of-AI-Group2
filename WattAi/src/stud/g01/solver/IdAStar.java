@@ -1,108 +1,100 @@
 package stud.g01.solver;
 
-import algs4.util.StopwatchCPU;
 import core.problem.Problem;
 import core.solver.algorithm.heuristic.Predictor;
 import core.solver.algorithm.searcher.AbstractSearcher;
 import core.solver.queue.Frontier;
 import core.solver.queue.Node;
 
-import java.sql.SQLException;
 import java.util.Deque;
 import java.util.List;
 import java.util.Stack;
 
 /**
- * IdAStar算法，基于A*的迭代加深搜索。
- * 通过设定估值剪枝阈值进行深度优先搜索，每轮迭代增加剪枝阈值。
+ * IDA* 搜索器
+ * 使用 f = g + h 的迭代加深 A* 搜索策略
  */
 public class IdAStar extends AbstractSearcher {
 
-    private final Predictor predictor; // 启发式估值函数
-    private final Stack<Node> openStack; // 用于DFS的栈
-    private int cutoff; // 当前剪枝阈值
-    private int maxIteratorDepth = 8192; // 最大迭代深度
-    private int newCutoff; // 下一轮迭代的剪枝阈值
-    private int expanded; // 已扩展节点计数
-    private int generatedNodes; // 生成的节点计数
+    private final Predictor predictor;
+    private final Stack<Node> dfsStack; // 深度优先搜索栈
 
-    /**
-     * 构造函数
-     *
-     * @param frontier 不用在此类中，保留以符合父类的构造签名
-     * @param predictor 启发式估值函数
-     */
+    private int currentBound;   // 当前迭代的 f 限制
+    private int nextBound;      // 下一次迭代的 f 限制
+    private int expandedCount;  // 实际扩展的节点数
+    private int generatedCount; // 生成的节点数
+
+    private static final int MAX_F_BOUND = 8192; // 过大无意义，保护程序性能
+
     public IdAStar(Frontier frontier, Predictor predictor) {
         super(frontier);
         this.predictor = predictor;
-        this.openStack = new Stack<>(); // 初始化栈
+        this.dfsStack = new Stack<>();
     }
 
     @Override
     public Deque<Node> search(Problem problem) {
-        // 如果问题无解，直接返回null
+
         if (!problem.solvable()) {
             return null;
         }
 
-        // 初始化栈和计数器
-        openStack.clear();
-        expanded = 0;
-        generatedNodes = 0;
+        dfsStack.clear();
+        expandedCount = 0;
+        generatedCount = 0;
 
-        // 获取根节点并设置初始剪枝阈值
         Node root = problem.root(predictor);
-        StopwatchCPU timer1 = new StopwatchCPU();
-        cutoff = root.evaluation(); // 初始状态的 f = g + h
-//        double time1 = timer1.elapsedTime();
-//        System.out.println("执行了" + time1 + "s");
+        currentBound = root.evaluation(); // f = g + h
 
-        // 迭代搜索，直到达到最大深度或找到解
-        while (cutoff < maxIteratorDepth) {
-            // 每一轮都从起点开始重新 DFS 搜索
-            openStack.push(root); // 根节点入栈
-            newCutoff = Integer.MAX_VALUE; // 重置新阈值
+        while (currentBound < MAX_F_BOUND) {
 
-            // 带剪枝的DFS搜索
-            while (!openStack.isEmpty()) {
-                Node node = openStack.pop();
-                expanded++;
+            dfsStack.push(root);
+            nextBound = Integer.MAX_VALUE;
 
-                // 如果找到目标节点，返回路径
+            while (!dfsStack.isEmpty()) {
+                Node node = dfsStack.pop();
+                expandedCount++;
+
                 if (problem.goal(node.getState())) {
                     return generatePath(node);
                 }
 
-                // 扩展当前节点并统计生成的节点数
-                List<Node> children = problem.childNodes(node, predictor);
-                generatedNodes += children.size();
+                List<Node> successors = problem.childNodes(node, predictor);
+                generatedCount += successors.size();
 
-                for (Node child : children) {
-                    int childEval = child.evaluation();
-                    if (childEval <= cutoff) { // 若子节点在当前阈值内
-                        // 防止回溯到父节点
-                        if (node.getParent() == null || !node.getParent().equals(child)) {
-                            openStack.push(child);
-                        }
-                    } else { // 更新新阈值
-                        newCutoff = Math.min(childEval, newCutoff);
+                final Node parent = node.getParent();
+
+                for (Node succ : successors) {
+                    int fSucc = succ.evaluation();
+
+                    // 记录下一轮的最小 f 作为新 bound
+                    if (fSucc > currentBound) {
+                        nextBound = Math.min(nextBound, fSucc);
+                        continue;
                     }
+
+                    // 避免走回头路
+                    if (parent != null && succ.equals(parent)) {
+                        continue;
+                    }
+
+                    dfsStack.push(succ);
                 }
             }
-            // 更新剪枝阈值
-            cutoff = newCutoff;
+
+            currentBound = nextBound; // 进入下一轮迭代
         }
-        // 若达到最大深度且无解，返回null
-        return null;
+
+        return null; // 未找到解
     }
 
     @Override
     public int nodesExpanded() {
-        return expanded; // 返回扩展节点数
+        return expandedCount;
     }
 
     @Override
     public int nodesGenerated() {
-        return generatedNodes; // 返回生成的节点数
+        return generatedCount;
     }
 }
