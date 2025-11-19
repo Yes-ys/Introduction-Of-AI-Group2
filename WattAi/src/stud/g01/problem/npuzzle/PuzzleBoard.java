@@ -5,10 +5,8 @@ import core.problem.State;
 import core.runner.SearchTester;
 import core.solver.algorithm.heuristic.HeuristicType;
 import core.solver.algorithm.heuristic.Predictor;
-import stud.g01.pdb.SQLitePDB;
-
+import stud.g01.utils.PatternDBBuilder;
 import java.util.*;
-import java.util.logging.Level;
 
 import static core.solver.algorithm.heuristic.HeuristicType.*;
 
@@ -18,13 +16,14 @@ public class PuzzleBoard extends State {
     private final int hashcode;
     private final String tostring;
 
-    //ά��mht�Ĺ�ֵ����Ҫ���ڴ���PuzzleBoardʵ����ʱ���޸�����������Ա��
-    //������Ҫ�޸��õ���PuzzleBoardʵ�����ĺ�������Ҫ�ǹ��캯����next������
-    //ʹ�����ǽ��б�ݵ�mht��ֵ���㣬��Ҫ�޸�mht��ֵ������
-    //�Ƿ���mht��ֵ��PuzzleFeeder��ȷ��
     private int manhattan_heuristics;
-    private static int[][] GoalBoard = new int[16][2];//目标状态9/16个数字的坐标，先x后y
+    private static final int[][] GoalBoard = new int[16][2];//目标状态9/16个数字的坐标，先x后y
     private static boolean if_mht;
+    private static int[][] PATTERNS = {
+            {1, 5, 6, 9, 10, 13},
+            {7, 8, 11, 12, 14, 15},
+            {2, 3, 4}
+    };
 
     //不相交模式数据库的A*算法用
 //    private static final String pdbPath = "data.db";
@@ -61,7 +60,6 @@ public class PuzzleBoard extends State {
     public PuzzleBoard(int[][] cur,int[][] tar, int h){
         if(h == -1){
             if_mht = true;
-            //�����ĳ�ʼ��
             this.board = cur;
             int size = cur.length;
             for (int i = 0; i < size; i++){
@@ -72,7 +70,6 @@ public class PuzzleBoard extends State {
                     }
                 }
             }
-            //��ʼ��ʱ����h=-1����Ӧini��Ҫͨ����������mht����
             int distance = 0;
             Map<Integer, int[]> targetPositions = new HashMap<>();
             for (int i = 0; i < size; i++) {
@@ -95,7 +92,6 @@ public class PuzzleBoard extends State {
                 }
             }
             manhattan_heuristics = distance;
-            //��ʼ��Ŀ��״̬�����ֵ�����
             for(int i = 0;i < size;i++){
                 for(int j = 0;j < size;j++)
                 {
@@ -156,7 +152,6 @@ public class PuzzleBoard extends State {
         new_board[x][y] = dest_val;
         PuzzleBoard result = new PuzzleBoard(new_board);
 
-        //xy��dest_val���ڵ����꣬row col��dest_valԭ��������
         if(if_mht){
             result.manhattan_heuristics = manhattan_heuristics -
                     (Math.abs(row-GoalBoard[dest_val][0])+Math.abs(col-GoalBoard[dest_val][1]))+
@@ -173,7 +168,6 @@ public class PuzzleBoard extends State {
         return moves;
     }
 
-    // ö��ӳ�䣬��Ų�ͬ���͵���������
     private static final EnumMap<HeuristicType, Predictor> predictors = new EnumMap<>(HeuristicType.class);
     static{
         predictors.put(MISPLACED, PuzzleBoard::misplacedTiles);
@@ -236,6 +230,16 @@ public class PuzzleBoard extends State {
         }
     }
 
+    private static int[] extractPattern(int[] pos, int[] tiles) {
+        int K = tiles.length;
+        int[] res = new int[K];
+        for (int i = 0; i < K; i++) {
+            res[i] = pos[tiles[i]];
+        }
+        return res;
+    }
+
+
     private static int DisjointPatternDatabase(State state, State goal) {
         PuzzleBoard current = (PuzzleBoard) state;
         int size = current.board.length;
@@ -244,25 +248,18 @@ public class PuzzleBoard extends State {
 
         String[] Patterns = new String[3];
         for (int i = 0; i < Patterns.length; i++) {
-            Patterns[i] = ""; //��ʼ��Patterns
+            Patterns[i] = ""; // 初始化 Patterns
         }
-        int[] rowBoard = new int[15]; // rowBoard[i]：i + 1 出现的位置
+        int[] rowBoard = new int[16]; // rowBoard[i]：i 出现的位置
         for(int i = 0;i < 16;i++)
         {
             int num = current.board[i/4][i%4];
-            if(num == 0) continue;
-            rowBoard[num - 1] = i;
+            rowBoard[num] = i;
         }
 
-        for(int i = 0;i < 3;i++)
+        for (int i = 0; i < 3; i++)
         {
-            Patterns[i] += "[";
-            for(int j = 0;j < 5;j++)
-            {
-                Patterns[i] += String.valueOf(rowBoard[i*5 + j]);
-                if(j != 4)Patterns[i] += ", ";
-            }
-            Patterns[i] += "]";
+            Patterns[i] = String.valueOf(PatternDBBuilder.encode(extractPattern(rowBoard, PATTERNS[i])));
         }
 
         int pdb_heuristics = 0;
@@ -271,110 +268,72 @@ public class PuzzleBoard extends State {
             for(int patternId = 1; patternId <= 3; patternId++)
             {
                 String key = Patterns[patternId - 1];
-//                System.out.println("key:"+key);
-//                System.out.println("PatternId:"+patternId);
                 if (SearchTester.pdb.hasKey(patternId, key)) {
                     pdb_heuristics += SearchTester.pdb.getCost(patternId, key);
                 } else {
-                    System.out.println("����ʧ�ܣ�ģʽ������");
+                    System.out.println("查找错误");
                 }
             }
         } catch (Exception e) {
             SearchTester.pdb.rollback();
         }
 
-//        for debug����ӡ���ݿ�������
-//        try (SQLitePDB pdb = new SQLitePDB(pdbPath, 1024)) {
-//            pdb.open();
-//            List<Map<String, Object>> entries = pdb.viewAllEntries();
-//            for (Map<String, Object> entry : entries) {
-//                System.out.println(entry);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-
-        return pdb_heuristics;
+        return Math.max(pdb_heuristics, linearConflict(state, goal));
     }
 
+    // 计算线性冲突数量
+    public static int nLinearConflicts(State state, State goal) {
+        PuzzleBoard cur = (PuzzleBoard) state;
+        int size = cur.board.length;
+        int count = 0; // 用于记录线性冲突的数量
+
+        // 用于存储每个数字对应的实际行和列
+        int[] pR = new int[size * size + 1];
+        int[] pC = new int[size * size + 1];
+
+        // 初始化pR和pC数组
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                pR[cur.board[r][c]] = r; // 存储数字对应的行
+                pC[cur.board[r][c]] = c; // 存储数字对应的列
+            }
+        }
+
+        // 检查每一行的线性冲突
+        for (int r = 0; r < size; r++) {
+            for (int cl = 0; cl < size; cl++) {
+                for (int cr = cl + 1; cr < size; cr++) {
+                    // 检查行中的线性冲突
+                    if ( (r * size + cl + 1) != 0 && (r * size + cr + 1) != 0 && // 确保数字不是0（空位）
+                            r == pR[(r * size + cl + 1)] && // 左边的数字在当前行
+                            pR[(r * size + cl + 1)] == pR[(r * size + cr + 1)] && // 右边的数字也在当前行
+                            pC[(r * size + cl + 1)] > pC[(r * size + cr + 1)]) { // 左边的数字在右边的数字的目标位置之后
+                        count++;
+                    }
+
+                    // 检查列中的线性冲突
+                    if ((cl * size + r + 1) != 0 && (cr * size + r + 1) != 0 && // 确保数字不是0（空位）
+                            r == pC[(cl * size + r + 1)] && // 上边的数字在当前列
+                            pC[(cl * size + r + 1)] == pC[(cr * size + r + 1)] && // 下边的数字也在当前列
+                            pR[(cl * size + r + 1)] > pR[(cr * size + r + 1)]) { // 上边的数字在下边的数字的目标位置之下
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
     // 计算当前状态到目标状态的 Linear Conflict 距离
 private static int linearConflict(State state, State goal) {
-    PuzzleBoard current = (PuzzleBoard) state;
-    PuzzleBoard target = (PuzzleBoard) goal;
-    int size = current.board.length;
-    int manhattanSum = 0;
-
-    int[][] goalPosition = new int[size * size][2];
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            int value = target.board[i][j];
-            goalPosition[value][0] = i;
-            goalPosition[value][1] = j;
-        }
-    }
-
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            int value = current.board[i][j];
-            if (value != 0) {
-                manhattanSum += Math.abs(i - goalPosition[value][0]) + Math.abs(j - goalPosition[value][1]);
-            }
-        }
-    }
-
-    int linearConflictSum = 0;
-
-    // Check rows for linear conflicts
-    for (int i = 0; i < size; i++) {
-        int max = -1;
-        for (int j = 0; j < size; j++) {
-            int value = current.board[i][j];
-            if (value != 0 && goalPosition[value][0] == i) {
-                if (value > max) {
-                    max = value;
-                } else {
-                    linearConflictSum += 2;
-                }
-            }
-        }
-    }
-
-    // Check columns for linear conflicts
-    for (int j = 0; j < size; j++) {
-        int max = -1;
-        for (int i = 0; i < size; i++) {
-            int value = current.board[i][j];
-            if (value != 0 && goalPosition[value][1] == j) {
-                if (value > max) {
-                    max = value;
-                } else {
-                    linearConflictSum += 2;
-                }
-            }
-        }
-    }
-
-    return manhattanSum + linearConflictSum;
+    return manhattanDistance(state, goal) + 2 * nLinearConflicts(state,goal);
 }
-
-
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-
-        if (obj instanceof PuzzleBoard another) {
-            if (this.x == another.x && this.y == another.y){
-                int crt_size = board.length;
-                for (int i = 0; i < crt_size; i++){
-                    for (int j = 0; j < crt_size; j++){
-                        if (this.board[i][j] != another.board[i][j]) return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
+        if (this == obj) return true;
+        if (!(obj instanceof PuzzleBoard other)) return false;
+        return Arrays.deepEquals(this.board, other.board);
     }
 
 

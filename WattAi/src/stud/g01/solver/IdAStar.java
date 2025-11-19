@@ -1,95 +1,100 @@
 package stud.g01.solver;
 
-
-import java.util.*;
-
 import core.problem.Problem;
-import core.problem.State;
 import core.solver.algorithm.heuristic.Predictor;
 import core.solver.algorithm.searcher.AbstractSearcher;
 import core.solver.queue.Frontier;
 import core.solver.queue.Node;
-import stud.g01.problem.npuzzle.Direction;
 
+import java.util.Deque;
+import java.util.List;
+import java.util.Stack;
+
+/**
+ * IDA* 搜索器
+ * 使用 f = g + h 的迭代加深 A* 搜索策略
+ */
 public class IdAStar extends AbstractSearcher {
 
-    private static final int[] DX = {0, 1, -1, 0};
-    private static final int[] DY = {1, 0, 0, -1};
-
-    private int maxDepth;
     private final Predictor predictor;
+    private final Stack<Node> dfsStack; // 深度优先搜索栈
 
-    // 显式调用父类构造函数
+    private int currentBound;   // 当前迭代的 f 限制
+    private int nextBound;      // 下一次迭代的 f 限制
+    private int expandedCount;  // 实际扩展的节点数
+    private int generatedCount; // 生成的节点数
+
+    private static final int MAX_F_BOUND = 8192; // 过大无意义，保护程序性能
+
     public IdAStar(Frontier frontier, Predictor predictor) {
-        super(frontier);  // 传递null，因为IDA*不需要Frontier
+        super(frontier);
         this.predictor = predictor;
+        this.dfsStack = new Stack<>();
     }
 
     @Override
     public Deque<Node> search(Problem problem) {
-        String initialState = problem.initialState.toString();
-        String GOAL_STATE = problem.goal.toString();Node root = null;
-        try {
-            root = problem.root(predictor);
-        } catch (java.sql.SQLException e) {}
 
-        //System.out.println(root.getState().toString());
-
-        if (initialState.equals(GOAL_STATE)) {
-            Deque<Node> result = new ArrayDeque<>();
-            result.add(new Node(root.getState(), null, null, 0, 0));
-            return result;
-        }
-
-        for (maxDepth = 1; ; maxDepth++) {
-            Node resultNode = depthLimitedSearch(root, 0, GOAL_STATE, problem);
-            if (resultNode != null) {
-                return buildPath(resultNode);
-            }
-        }
-    }
-
-    private Node depthLimitedSearch(Node now, int depth, String GOAL_STATE, Problem problem) {
-        if (now.getState().toString().equals(GOAL_STATE)) {
-            return now;
-        }
-
-        if (depth + now.getHeuristic() - 1 > maxDepth) {
+        if (!problem.solvable()) {
             return null;
         }
-        //System.out.println(now.getAction());
-        try {
 
-            for (Node child : problem.childNodes(now, predictor)) {
-                if (now.getParent() != null) {
-                    if (child.getState().toString().equals(now.getParent().getState().toString()))
-                        continue;
+        dfsStack.clear();
+        expandedCount = 0;
+        generatedCount = 0;
+
+        Node root = problem.root(predictor);
+        currentBound = root.evaluation(); // f = g + h
+
+        while (currentBound < MAX_F_BOUND) {
+
+            dfsStack.push(root);
+            nextBound = Integer.MAX_VALUE;
+
+            while (!dfsStack.isEmpty()) {
+                Node node = dfsStack.pop();
+                expandedCount++;
+
+                if (problem.goal(node.getState())) {
+                    return generatePath(node);
                 }
-                Node next = depthLimitedSearch(child, depth + 1, GOAL_STATE, problem);
-                if (next != null) return next;
+
+                List<Node> successors = problem.childNodes(node, predictor);
+                generatedCount += successors.size();
+
+                final Node parent = node.getParent();
+
+                for (Node succ : successors) {
+                    int fSucc = succ.evaluation();
+
+                    // 记录下一轮的最小 f 作为新 bound
+                    if (fSucc > currentBound) {
+                        nextBound = Math.min(nextBound, fSucc);
+                        continue;
+                    }
+
+                    // 避免走回头路
+                    if (parent != null && succ.equals(parent)) {
+                        continue;
+                    }
+
+                    dfsStack.push(succ);
+                }
             }
-        } catch (java.sql.SQLException e) {}
 
-        return null;
-    }
-
-    private String swap(String state, int pos1, int pos2) {
-        char[] chars = state.toCharArray();
-        char temp = chars[pos1];
-        chars[pos1] = chars[pos2];
-        chars[pos2] = temp;
-        return new String(chars);
-    }
-
-    private Deque<Node> buildPath(Node goalNode) {
-        Deque<Node> path = new ArrayDeque<>();
-        Node current = goalNode;
-
-        while (current.getParent() != null) {
-            path.addFirst(current);
-            current = current.getParent();
+            currentBound = nextBound; // 进入下一轮迭代
         }
 
-        return path;
+        return null; // 未找到解
+    }
+
+    @Override
+    public int nodesExpanded() {
+        return expandedCount;
+    }
+
+    @Override
+    public int nodesGenerated() {
+        return generatedCount;
     }
 }

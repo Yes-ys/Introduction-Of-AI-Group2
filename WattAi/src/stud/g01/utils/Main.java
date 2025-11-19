@@ -11,7 +11,7 @@ public class Main {
         try {
             db.open();  // main 控制数据库连接
             PatternDBBuilder pre = new PatternDBBuilder();
-            pre.buildAll(db);  // buildAll 内部不要重复 open/close
+            pre.buildAll(db);
             System.out.println("数据库预处理完成！");
         } catch (Exception e) {
             e.printStackTrace();

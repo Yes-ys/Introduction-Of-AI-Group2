@@ -20,6 +20,40 @@ public final class SQLitePDB implements AutoCloseable {
 
     private final Map<String, Integer> cache = Collections.synchronizedMap(new HashMap<>());
     private static final double TRIM_FACTOR = 1.2;
+    // 静态全局缓存 —— 所有 SQLitePDB 实例共享
+    private static final Map<Integer, Map<String, Integer>> fullCache = new HashMap<>();
+
+    public static synchronized void loadAllToMemory(String dbPath) {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT pattern_id, key, cost FROM entries")) {
+
+            fullCache.clear(); // 重新加载
+
+            while (rs.next()) {
+                int pid = rs.getInt("pattern_id");
+                String key = rs.getString("key");
+                int cost = rs.getInt("cost");
+
+                fullCache
+                        .computeIfAbsent(pid, k -> new HashMap<>())
+                        .put(key, cost);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("加载 fullCache 失败：" + e.getMessage(), e);
+        }
+
+        System.out.println("SQLitePDB: fullCache 加载完成，共加载 " +
+                fullCache.values().stream().mapToInt(Map::size).sum() + " 条记录");
+    }
+
+    public static Integer fastGetCost(int patternId, String key) {
+        Map<String, Integer> sub = fullCache.get(patternId);
+        if (sub == null) return null;
+        return sub.get(key);
+    }
+
 
     public SQLitePDB(String dbPath, int cacheCapacity) {
         this.dbPath = Objects.requireNonNull(dbPath, "dbPath 不能为空");
@@ -74,29 +108,7 @@ public final class SQLitePDB implements AutoCloseable {
     private String cacheKey(int patternId, String key) { return patternId + "|" + key; }
 
     public Integer getCost(int patternId, String key) {
-        String ckey = cacheKey(patternId, key);
-        Integer cached;
-        synchronized (cache) {
-            cached = cache.get(ckey);
-        }
-        if (cached != null) return cached;
-        try {
-            try (PreparedStatement ps = conn().prepareStatement(
-                    "SELECT cost FROM entries WHERE pattern_id = ? AND key = ?")) {
-                ps.setInt(1, patternId);
-                ps.setString(2, key);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        int cost = rs.getInt(1);
-                        putCacheIfNeeded(ckey, cost);
-                        return cost;
-                    } else return null;
-                }
-            }
-        }catch (SQLException e) {
-            handleSQLException(e);
-            return null; // unreachable
-        }
+        return fastGetCost(patternId, key);
     }
 
     /**
